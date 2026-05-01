@@ -1,0 +1,1315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>MicroASM Config Editor</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<style>
+
+body {
+    font-family: Arial;
+    margin: 20px; transition: 0.3s;
+}
+
+.dark {
+    background:#1e1e1e;
+    color:#ddd;
+}
+
+input, textarea {
+    margin: 4px;
+}
+
+.section {
+    border:1px solid #888;
+    padding:10px;
+    margin-bottom:15px;
+}
+
+.signal, .action-row {
+    display: grid;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 5px;
+}
+
+.action-row {
+    grid-template-columns: 110px 80px 28px;
+}
+
+.signal {
+    grid-template-columns: 110px 60px 50px 160px 28px;
+}
+
+.signal .values-btn {
+    width: 100%;
+    height: 24px;
+}
+
+.col-header {
+    display: grid;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 5px;
+    font-size: 13px;
+    font-weight: bold;
+    color: #555;
+    border-bottom: 1px solid #ccc;
+    margin-bottom: 2px;
+    white-space: nowrap;
+}
+
+.action-header {
+    grid-template-columns: 110px 80px 28px;
+}
+
+.signal-header {
+    grid-template-columns: 110px 60px 50px 160px 28px;
+}
+
+.dark .col-header {
+    color: #aaa;
+    border-bottom-color: #555;
+}
+
+#signals, #actions {
+    border-bottom: 1px dashed #aaa;
+    margin-bottom: 6px;
+}
+
+.conflict {
+    background:#ff6b6b;
+}
+
+.block {
+    position:absolute;
+    border-radius:8px;
+    color:white;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    cursor:default;
+    font-size:12px;
+    text-align:center;
+    padding:4px;
+    box-sizing:border-box;
+}
+
+#filename {
+    font-family: monospace;
+    background: rgba(0,0,0,0.05);
+    padding: 3px 6px;
+    border-radius: 4px;
+}
+
+.dark #filename {
+    background: rgba(255,255,255,0.1);
+    color: #ddd;
+}
+
+.dark #output {
+    background: #2a2a2a;
+    color: #ddd;
+    border-color: #555;
+}
+
+.dark button {
+    background: #3a3a3a;
+    color: #ddd;
+    border: 1px solid #666;
+}
+
+.dark button:hover {
+    background: #4a4a4a;
+    border-color: #888;
+}
+
+.dark input:not([type="hidden"]),
+.dark textarea,
+.dark select {
+    background: #2a2a2a;
+    color: #ddd;
+    border: 1px solid #555;
+}
+
+.dark .section {
+    border-color: #555;
+}
+
+.dark .col-header {
+    color: #aaa;
+    border-bottom-color: #555;
+}
+
+canvas {
+    border:1px solid black;
+    margin-top:10px;
+    display: none;
+}
+
+button {
+    margin:5px;
+}
+
+.signal button, .action-row button {
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+#conflictSummary {
+    display:none;
+    margin-top:8px;
+    padding:8px 12px;
+    border-radius:6px;
+    font-size:13px;
+}
+
+#conflictSummary.ok {
+    background:#d4edda;
+    color:#155724;
+    border:1px solid #c3e6cb;
+}
+
+#conflictSummary.err {
+    background:#f8d7da;
+    color:#721c24;
+    border:1px solid #f5c6cb;
+}
+
+.dark #conflictSummary.ok {
+    background:#1a3a25;
+    color:#7ec89a;
+    border-color:#2d6a4f;
+}
+
+.dark #conflictSummary.err {
+    background:#3a1a1e;
+    color:#e07c84;
+    border-color:#6a2d32;
+}
+
+/* Values dialog */
+#valuesDialog {
+    border: 1px solid #888;
+    border-radius: 8px;
+    padding: 16px;
+    min-width: 320px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.25);
+}
+
+#valuesDialog::backdrop {
+    background: rgba(0,0,0,0.4);
+}
+
+.dark #valuesDialog {
+    background: #2a2a2a;
+    color: #ddd;
+    border-color: #555;
+}
+
+.value-row {
+    display: grid;
+    grid-template-columns: 120px 80px 28px;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 4px;
+}
+
+.value-header {
+    display: grid;
+    grid-template-columns: 120px 80px 28px;
+    gap: 4px;
+    padding: 2px 4px;
+    font-size: 13px;
+    font-weight: bold;
+    color: #555;
+    border-bottom: 1px solid #ccc;
+    margin-bottom: 2px;
+    white-space: nowrap;
+}
+
+.dark .value-header {
+    color: #aaa;
+    border-bottom-color: #555;
+}
+
+#valuesList {
+    margin-bottom: 8px;
+    min-height: 32px;
+}
+
+.values-btn {
+    font-size: 11px;
+    padding: 2px 6px;
+    cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 160px;
+    text-align: left;
+}
+
+</style>
+</head>
+
+<body>
+
+<h2>MicroASM Config Editor</h2>
+
+<input type="file" id="fileInput" style="display:none">
+
+<div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+    <button onclick="newFile()">New</button>
+    <button onclick="openFile()">Open JSON</button>
+    <button onclick="saveJSON()">Save JSON</button>
+    <button onclick="toggleTheme()">&#127769; Theme</button>
+    <input id="filename" type="text" value="New file"
+           style="margin-left:20px; font-size:12px; opacity:0.8; width:200px;">
+</div>
+
+<div class="section">
+    <h3>ROM</h3>
+    Address bits: <input id="addrBits" type="number" value="12" style="width:60px">
+    &nbsp;&nbsp;
+    Word size: <input id="wordSize" type="number" value="32" style="width:60px">
+</div>
+
+<div class="section">
+    <h3>Actions</h3>
+    <div class="col-header action-header">
+        <span>Name</span><span>Value (0-15)</span><span></span>
+    </div>
+    <div id="actions"></div>
+    <button onclick="addAction()">Add action</button>
+    <button onclick="checkActions()">Check actions</button>
+    <div id="actionError" style="display:none; margin-top:6px; padding:6px 10px; border-radius:4px; font-size:13px; background:#f8d7da; color:#721c24; border:1px solid #f5c6cb;"></div>
+</div>
+
+<div class="section">
+    <h3>Signals</h3>
+    <div class="col-header signal-header">
+        <span>Name</span><span>Start bit</span><span>Width</span><span>Values</span><span></span>
+    </div>
+    <div id="signals"></div>
+    <button onclick="addSignal()">Add signal</button>
+    <button onclick="checkConflicts()">Check conflicts</button>
+    <div id="signalError" style="display:none; margin-top:6px; padding:6px 10px; border-radius:4px; font-size:13px; background:#f8d7da; color:#721c24; border:1px solid #f5c6cb;"></div>
+    <div id="conflictSummary"></div>
+    <div id="diagramArea" style="position:relative; width:100%; min-height:120px; border:1px solid #aaa; margin-top:10px; overflow-x:auto;"></div>
+</div>
+
+<div class="section">
+    <h3>Output</h3>
+    <textarea id="output" rows="15" style="display:block; width:100%; box-sizing:border-box; font-family:monospace; font-size:12px; resize:vertical;"></textarea>
+    <div style="margin-top:6px;">
+        <button onclick="generateDoc()">Generate documentation</button>
+        <button onclick="exportPDF()">Export PDF</button>
+    </div>
+</div>
+
+<canvas id="diagram" width="800" height="200"></canvas>
+
+<datalist id="signalNames"></datalist>
+
+<dialog id="valuesDialog">
+    <b id="valuesDialogTitle" style="display:block;margin-bottom:10px;font-size:14px;"></b>
+    <div class="value-header">
+        <span>Name</span><span>Value</span><span></span>
+    </div>
+    <div id="valuesList"></div>
+    <button onclick="addValueRow()">Add value</button>
+    <div id="valuesError" style="display:none; margin-top:8px; padding:6px 10px; border-radius:4px; font-size:13px; background:#f8d7da; color:#721c24; border:1px solid #f5c6cb;"></div>
+    <div style="margin-top:10px; display:flex; gap:8px; justify-content:flex-end;">
+        <button onclick="closeValuesDialog(true)">OK</button>
+        <button onclick="closeValuesDialog(false)">Cancel</button>
+    </div>
+</dialog>
+
+<script>
+
+let dirty = false;
+let currentFileName = "New file";
+let _suppressDiagram = false;
+
+// =========================
+// DIRTY FLAG + AUTOSAVE
+// =========================
+document.addEventListener("input", () => {
+    dirty = true;
+    autoSave();
+});
+
+window.onbeforeunload = () => dirty ? "There are unsaved changes!" : null;
+
+function autoSave(){
+    const state = {
+        addrBits: addrBits.value,
+        wordSize: wordSize.value,
+        actions: document.getElementById("actions").innerHTML,
+        signals: document.getElementById("signals").innerHTML,
+        filename: currentFileName
+    };
+    localStorage.setItem("microasm_autosave", JSON.stringify(state));
+}
+
+function loadAutoSave(){
+    const data = localStorage.getItem("microasm_autosave");
+    if(!data) return;
+    if(!confirm("Restore last auto-saved session?")) return;
+
+    const s = JSON.parse(data);
+    addrBits.value = s.addrBits;
+    if(s.wordSize) wordSize.value = s.wordSize;
+    document.getElementById("actions").innerHTML = s.actions || "";
+    document.getElementById("signals").innerHTML = s.signals || "";
+    currentFileName = s.filename || "Recovered";
+    updateFileName();
+}
+
+// =========================
+// THEME
+// =========================
+function toggleTheme(){
+    document.body.classList.toggle("dark");
+    localStorage.setItem("theme", document.body.classList.contains("dark"));
+}
+
+function loadTheme(){
+    if(localStorage.getItem("theme") === "true"){
+        document.body.classList.add("dark");
+    }
+}
+
+// =========================
+// FILE
+// =========================
+function updateFileName(){
+    let input = document.getElementById("filename");
+    let name = currentFileName;
+    if(dirty) name += " *";
+    input.value = name;
+}
+
+function openFile(){
+    document.getElementById("fileInput").click();
+}
+
+const fileInput = document.getElementById("fileInput");
+
+fileInput.addEventListener("change", function(e){
+    const file = e.target.files[0];
+    if(!file) return;
+    currentFileName = file.name;
+    updateFileName();
+    const reader = new FileReader();
+    reader.onload = evt => loadJSONContent(evt.target.result);
+    reader.readAsText(file);
+    dirty = false;
+});
+
+function sanitizeFileName(name){
+    return name.replace(/[\\/:*?"<>|]/g, "_");
+}
+
+function saveJSON(){
+    generateJSON();
+    let cfg;
+    try {
+        cfg = JSON.parse(output.value);
+    } catch(e){
+        alert("Invalid JSON");
+        return;
+    }
+
+    let errors = validateConfig(cfg);
+    if(errors.length){
+        alert("Errors:\n" + errors.join("\n"));
+        return;
+    }
+
+    const blob = new Blob([output.value], {type:"application/json"});
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = sanitizeFileName(currentFileName || "config.json");
+    a.click();
+    dirty = false;
+}
+
+function newFile(){
+    if(dirty){
+        if(!confirm("Discard current changes?")) return;
+    }
+
+    addrBits.value = 12;
+    wordSize.value = 32;
+    document.getElementById("actions").innerHTML = "";
+    document.getElementById("signals").innerHTML = "";
+    output.value = "";
+    hideSummary();
+
+    currentFileName = "New file";
+    dirty = false;
+    updateFileName();
+    localStorage.removeItem("microasm_autosave");
+}
+
+// =========================
+// VALIDATE CONFIG
+// =========================
+function validateConfig(cfg){
+    let errors = [];
+
+    if(!cfg.rom || !cfg.rom.address_bits)
+        errors.push("Invalid ROM configuration");
+
+    if(!cfg.signals)
+        errors.push("Missing signals");
+
+    if(!cfg.action)
+        errors.push("Missing actions");
+
+    let used = {};
+
+    for(let s in cfg.signals){
+        let sig = cfg.signals[s];
+        let bits = [];
+
+        if(sig.bit !== undefined){
+            bits.push(sig.bit);
+        } else if(sig.bits){
+            for(let i=sig.bits[0]; i<=sig.bits[1]; i++)
+                bits.push(i);
+        } else {
+            errors.push(`Signal ${s} has no bits defined`);
+        }
+
+        bits.forEach(b=>{
+            if(used[b]){
+                errors.push(`Bit ${b} conflict: ${used[b]} vs ${s}`);
+            } else {
+                used[b] = s;
+            }
+        });
+    }
+
+    return errors;
+}
+
+// =========================
+// JSON LOAD
+// =========================
+function loadJSONContent(text){
+    const cfg = JSON.parse(text);
+
+    addrBits.value = cfg.rom.address_bits;
+    if(cfg.rom.word_size) wordSize.value = cfg.rom.word_size;
+
+    document.getElementById("actions").innerHTML = "";
+    for(let k in cfg.action){
+        addAction(k, cfg.action[k]);
+    }
+
+    document.getElementById("signals").innerHTML = "";
+
+    let resolvedValues = {};
+
+    function resolveValues(name){
+        let sig = cfg.signals[name];
+        if(!sig) return null;
+        if(typeof sig.values === "string" && sig.values.startsWith("@")){
+            let ref = sig.values.substring(1);
+            return resolveValues(ref);
+        }
+        return sig.values || null;
+    }
+
+    for(let s in cfg.signals){
+        resolvedValues[s] = resolveValues(s);
+    }
+
+    for(let s in cfg.signals){
+        let sig = cfg.signals[s];
+        let values = "";
+        let vals = resolvedValues[s];
+
+        if(vals){
+            for(let v in vals){
+                values += `${v}=${vals[v]},`;
+            }
+            values = values.replace(/,$/, "");
+        }
+
+        let bitStart = "";
+        let width = "";
+
+        if(sig.bit !== undefined){
+            bitStart = sig.bit;
+            width = 1;
+        } else if(sig.bits){
+            bitStart = sig.bits[0];
+            width = sig.bits[1] - sig.bits[0] + 1;
+        }
+
+        addSignal(s, bitStart, width, values);
+    }
+
+    hideSummary();
+    updateAutocomplete();
+}
+
+// =========================
+// ACTIONS
+// =========================
+function addAction(name="", value=""){
+    const div = document.createElement("div");
+    div.className = "action-row";
+    div.innerHTML = `
+    <input class="actionName" value="${name}">
+    <input class="actionValue" type="number" min="0" max="15" value="${value}">
+    <button onclick="this.closest('.action-row').remove()">&#10005;</button>
+    `;
+    document.getElementById("actions").appendChild(div);
+}
+
+// =========================
+// SIGNALS
+// =========================
+function updateAutocomplete(){
+    let dl = document.getElementById("signalNames");
+    dl.innerHTML = "";
+    document.querySelectorAll(".signal .name").forEach(inp=>{
+        let val = inp.value;
+        if(!val) return;
+        let opt = document.createElement("option");
+        opt.value = val;
+        dl.appendChild(opt);
+    });
+}
+
+function nextAvailableBit(){
+    let rows = document.querySelectorAll(".signal");
+    if(rows.length === 0) return 4;
+    let max = 4;
+    rows.forEach(div=>{
+        let bs = parseInt(div.querySelector(".bitStart").value);
+        let w  = parseInt(div.querySelector(".width").value);
+        if(!isNaN(bs) && !isNaN(w)) max = Math.max(max, bs + w);
+    });
+    return max;
+}
+
+function sortSignals(){
+    let container = document.getElementById("signals");
+    let rows = Array.from(container.querySelectorAll(".signal"));
+    rows.sort((a, b)=>{
+        let bsA = parseInt(a.querySelector(".bitStart").value) || 0;
+        let bsB = parseInt(b.querySelector(".bitStart").value) || 0;
+        return bsA - bsB;
+    });
+    rows.forEach(row => container.appendChild(row));
+}
+
+function repackSignals(changedDiv){
+    // after a width change, recalculate bitStart of all subsequent signals
+    sortSignals();
+    let rows = Array.from(document.querySelectorAll(".signal"));
+    let idx  = rows.indexOf(changedDiv);
+    if(idx < 0) return;
+
+    // recalculate from the changed row onward
+    for(let i = idx; i < rows.length - 1; i++){
+        let bs = parseInt(rows[i].querySelector(".bitStart").value);
+        let w  = parseInt(rows[i].querySelector(".width").value);
+        if(isNaN(bs) || isNaN(w)) continue;
+        let nextBs = rows[i+1].querySelector(".bitStart");
+        nextBs.value = bs + w;
+    }
+}
+
+function showSignalError(msg){
+    let box = document.getElementById("signalError");
+    box.innerHTML = "&#9888; " + msg.replace(/\n/g, "<br>");
+    box.style.display = "block";
+    clearTimeout(showSignalError._timer);
+    showSignalError._timer = setTimeout(() => {
+        box.style.display = "none";
+    }, 6000);
+}
+
+function checkActions(){
+    let rows = document.querySelectorAll(".action-row");
+    let names  = [];
+    let values = [];
+    let errors = [];
+
+    rows.forEach(row => {
+        let name = row.querySelector(".actionName").value.trim();
+        let val  = parseInt(row.querySelector(".actionValue").value);
+
+        if(!name) return;
+
+        if(isNaN(val) || val < 0 || val > 15)
+            errors.push("Action \"" + name + "\": value " + val + " is out of range (0-15).");
+
+        if(names.includes(name))
+            errors.push("Duplicate action name: \"" + name + "\".");
+        else
+            names.push(name);
+
+        if(!isNaN(val) && values.includes(val))
+            errors.push("Duplicate action value: " + val + " (used by \"" + name + "\").");
+        else if(!isNaN(val))
+            values.push(val);
+    });
+
+    let box = document.getElementById("actionError");
+    if(errors.length){
+        box.innerHTML = errors.map(e => "&#9888; " + e).join("<br>");
+        box.style.display = "block";
+    } else {
+        box.innerHTML = "&#10004; No issues found in Actions.";
+        box.style.color = "#155724";
+        box.style.background = "#d4edda";
+        box.style.borderColor = "#c3e6cb";
+        box.style.display = "block";
+        clearTimeout(checkActions._timer);
+        checkActions._timer = setTimeout(() => {
+            box.style.display = "none";
+            box.style.color = "";
+            box.style.background = "#f8d7da";
+            box.style.borderColor = "#f5c6cb";
+        }, 4000);
+    }
+}
+
+function availableSignalBits(){
+    // word_size - 4 (ACTION bits 0-3)
+    // NEXT_ADDRESS bits overlap signals intentionally and are not subtracted
+    let ws = parseInt(document.getElementById("wordSize").value) || 32;
+    return ws - 4;
+}
+
+function usedSignalBits(excludeDiv){
+    // sum of all signal widths, optionally excluding one div (for width-change check)
+    let total = 0;
+    document.querySelectorAll(".signal").forEach(div => {
+        if(div === excludeDiv) return;
+        let w = parseInt(div.querySelector(".width").value);
+        if(!isNaN(w)) total += w;
+    });
+    return total;
+}
+
+function addSignal(name="", bitStart="", width="", values=""){
+    if(bitStart === "") bitStart = nextAvailableBit();
+
+    // only warn when adding interactively (width not pre-supplied from JSON)
+    if(width === ""){
+        let avail = availableSignalBits();
+        let used  = usedSignalBits(null);
+        if(used >= avail){
+            showSignalError(
+                "Warning: no signal bits available.\n" +
+                "Used: " + used + " bit(s), Available: " + avail + " bit(s).\n" +
+                "Increase Word size or reduce existing signals."
+            );
+        }
+    }
+    const div = document.createElement("div");
+    div.className = "signal";
+    // store values as data attribute, display as button label
+    let valLabel = valuesLabel(values);
+    div.innerHTML = `
+    <input class="name" list="signalNames" value="${name}">
+    <input class="bitStart" type="number" min="0" value="${bitStart}">
+    <input class="width" type="number" min="1" value="${width}">
+    <input class="values" type="hidden" value="${values}">
+    <button class="values-btn" onclick="openValuesDialog(this.closest('.signal'))">${valLabel}</button>
+    <button onclick="this.closest('.signal').remove()">&#10005;</button>
+    `;
+    document.getElementById("signals").appendChild(div);
+    div.querySelector(".bitStart").addEventListener("change", sortSignals);
+    const widthInput = div.querySelector(".width");
+
+    function validateWidth(){
+        let newWidth = parseInt(widthInput.value);
+        let oldWidth = parseInt(widthInput.dataset.last) || newWidth;
+
+        if(newWidth === oldWidth) return;  // no real change
+
+        let errorMsg = null;
+
+        // check reduction against existing values
+        if(newWidth < oldWidth){
+            let valStr = div.querySelector(".values").value;
+            if(valStr){
+                let entries  = valStr.split(",").filter(p => p.includes("="));
+                let count    = entries.length;
+                let maxVal   = entries.reduce((mx, p) => {
+                    let v = parseInt(p.split("=")[1]);
+                    return isNaN(v) ? mx : Math.max(mx, v);
+                }, 0);
+                let capacity = Math.pow(2, newWidth);
+                if(count > capacity || maxVal >= capacity){
+                    let sigName = div.querySelector(".name").value || "this signal";
+                    errorMsg = "Cannot reduce Width to " + newWidth + ":\n" +
+                        "\"" + sigName + "\" has " + count + " value(s) with max=" + maxVal + ",\n" +
+                        "but " + newWidth + " bit(s) can only represent values 0.." + (capacity-1) + ".";
+                }
+            }
+        }
+
+        // check increase against available bits
+        if(!errorMsg && newWidth > oldWidth){
+            let avail = availableSignalBits();
+            let used  = usedSignalBits(div) + newWidth;
+            if(used > avail){
+                let sigName = div.querySelector(".name").value || "this signal";
+                errorMsg = "Cannot increase Width to " + newWidth + " for \"" + sigName + "\":\n" +
+                    "Total signal bits would be " + used + ",\n" +
+                    "but only " + avail + " bit(s) are available " +
+                    "(Word size " + (parseInt(document.getElementById("wordSize").value)||32) +
+                    " - 4 ACTION bits).\n\nReduce other signals or increase Word size first.";
+            }
+        }
+
+        if(errorMsg){
+            _suppressDiagram = true;
+            widthInput.value = oldWidth;
+            widthInput.dataset.last = oldWidth;
+            _suppressDiagram = false;
+            showSignalError(errorMsg);
+            return;
+        }
+
+        // accepted
+        widthInput.dataset.last = newWidth;
+        repackSignals(div);
+    }
+
+    widthInput.dataset.last = widthInput.value;
+    widthInput.addEventListener("change", validateWidth);
+    sortSignals();
+    updateAutocomplete();
+}
+
+// =========================
+// VALUES DIALOG
+// =========================
+
+let _valuesTargetSignal = null;
+
+function valuesLabel(str){
+    if(!str) return "— no values —";
+    let parts = str.split(",").filter(p=>p.includes("="));
+    if(parts.length === 0) return "— no values —";
+    return parts.map(p=>p.trim()).join("  |  ");
+}
+
+function nextSuggestedValue(){
+    // returns last numeric value in the list + 1, or 0 if empty
+    let rows = document.querySelectorAll("#valuesList .value-row");
+    if(rows.length === 0) return 0;
+    let last = rows[rows.length - 1].querySelector(".vValue");
+    let v = parseInt(last.value);
+    return isNaN(v) ? 0 : v + 1;
+}
+
+function addValueRow(name="", value=""){
+    if(value === "") value = nextSuggestedValue();
+    let list = document.getElementById("valuesList");
+    let row = document.createElement("div");
+    row.className = "value-row";
+    row.innerHTML = `
+    <input class="vName" value="${name}" placeholder="Label">
+    <input class="vValue" type="number" min="0" value="${value}">
+    <button onclick="this.closest('.value-row').remove()" style="width:24px;height:24px;padding:0;margin:0;display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer;">&#10005;</button>
+    `;
+    list.appendChild(row);
+}
+
+function openValuesDialog(signalDiv){
+    _valuesTargetSignal = signalDiv;
+    let sigName = signalDiv.querySelector(".name").value || "Signal";
+    document.getElementById("valuesDialogTitle").textContent = `Values for: ${sigName}`;
+
+    // populate from hidden input
+    let current = signalDiv.querySelector(".values").value;
+    let list = document.getElementById("valuesList");
+    list.innerHTML = "";
+
+    if(current){
+        current.split(",").forEach(p=>{
+            let [k,v] = p.split("=");
+            if(k !== undefined && v !== undefined)
+                addValueRow(k.trim(), v.trim());
+        });
+    }
+
+    // sync dark theme
+    if(document.body.classList.contains("dark"))
+        document.getElementById("valuesDialog").style.cssText = "background:#2a2a2a;color:#ddd;border-color:#555;border-radius:8px;padding:16px;min-width:320px;";
+    else
+        document.getElementById("valuesDialog").style.cssText = "";
+
+    document.getElementById("valuesError").style.display = "none";
+    document.getElementById("valuesDialog").showModal();
+}
+
+function closeValuesDialog(save){
+    if(save && _valuesTargetSignal){
+        let rows = document.querySelectorAll("#valuesList .value-row");
+        let parts = [];
+        rows.forEach(row=>{
+            let k = row.querySelector(".vName").value.trim();
+            let v = row.querySelector(".vValue").value.trim();
+            if(k) parts.push(`${k}=${v}`);
+        });
+
+        const showValuesError = (msg) => {
+            let box = document.getElementById("valuesError");
+            box.innerHTML = "&#9888; " + msg.replace(/\n/g, "<br>");
+            box.style.display = "block";
+        };
+        document.getElementById("valuesError").style.display = "none";
+
+        // check for duplicate names
+        let names = parts.map(p => p.split("=")[0].trim());
+        let dupNames = [...new Set(names.filter((n, i) => names.indexOf(n) !== i))];
+        if(dupNames.length){
+            showValuesError("Duplicate label name(s): " + dupNames.join(", ") +
+                            "\nEach label must be unique.");
+            return;
+        }
+
+        // check for duplicate numeric values
+        let nums = parts.map(p => parseInt(p.split("=")[1]));
+        let dupNums = [...new Set(nums.filter((n, i) => nums.indexOf(n) !== i))];
+        if(dupNums.length){
+            showValuesError("Duplicate numeric value(s): " + dupNums.join(", ") +
+                            "\nEach numeric value must be unique.");
+            return;
+        }
+
+        // sort by numeric value ascending
+        parts.sort((a, b) => {
+            let va = parseInt(a.split("=")[1]);
+            let vb = parseInt(b.split("=")[1]);
+            return va - vb;
+        });
+
+        // validate count and max value against current Width
+        let width    = parseInt(_valuesTargetSignal.querySelector(".width").value) || 1;
+        let capacity = Math.pow(2, width);
+        let count    = parts.length;
+        let maxVal   = parts.reduce((mx, p) => {
+            let v = parseInt(p.split("=")[1]);
+            return isNaN(v) ? mx : Math.max(mx, v);
+        }, 0);
+
+        if(count > capacity || (count > 0 && maxVal >= capacity)){
+            let sigName = _valuesTargetSignal.querySelector(".name").value || "this signal";
+            showValuesError("Values exceed Width capacity for \"" + sigName + "\":\n" +
+                  count + " value(s), max=" + maxVal +
+                  " — Width=" + width + " supports 0.." + (capacity-1) + " only.\n" +
+                  "Increase Width or reduce/fix the values.");
+            return;
+        }
+
+        let str = parts.join(",");
+        _valuesTargetSignal.querySelector(".values").value = str;
+        _valuesTargetSignal.querySelector(".values-btn").textContent = valuesLabel(str);
+        dirty = true;
+        autoSave();
+    }
+    document.getElementById("valuesDialog").close();
+    _valuesTargetSignal = null;
+}
+
+// =========================
+// JSON GENERATE
+// =========================
+function parseValues(str){
+    if(!str) return null;
+    let obj = {};
+    str.split(",").forEach(p=>{
+        let [k,v] = p.split("=");
+        if(k && v !== undefined) obj[k.trim()] = parseInt(v);
+    });
+    return Object.keys(obj).length ? obj : null;
+}
+
+function generateJSON(){
+    let cfg = {
+        rom:{
+            address_bits: parseInt(addrBits.value),
+            word_size: parseInt(wordSize.value)
+        },
+        action:{},
+        signals:{}
+    };
+
+    document.querySelectorAll(".action-row").forEach(div=>{
+        let name  = div.querySelector(".actionName").value.trim();
+        let value = div.querySelector(".actionValue").value;
+        if(name) cfg.action[name] = parseInt(value);
+    });
+
+    document.querySelectorAll(".signal").forEach(div=>{
+        let name     = div.querySelector(".name").value;
+        let bitStart = div.querySelector(".bitStart").value;
+        let width    = div.querySelector(".width").value;
+        let values   = div.querySelector(".values").value;
+
+        if(!name) return;
+
+        cfg.signals[name] = {};
+
+        if(bitStart !== "" && width !== ""){
+            let bs = parseInt(bitStart);
+            let w  = parseInt(width);
+            if(w === 1){
+                cfg.signals[name].bit = bs;
+            } else {
+                cfg.signals[name].bits = [bs, bs + w - 1];
+            }
+        }
+
+        let v = parseValues(values);
+        if(v) cfg.signals[name].values = v;
+    });
+
+    output.value = JSON.stringify(cfg, null, 2);
+}
+
+// =========================
+// CONFLICT CHECK
+// =========================
+function hideSummary(){
+    let box = document.getElementById("conflictSummary");
+    box.style.display = "none";
+    box.className = "";
+    box.innerHTML = "";
+}
+
+function showSummary(messages, isError){
+    let box = document.getElementById("conflictSummary");
+    box.style.display = "block";
+    box.className = isError ? "err" : "ok";
+    box.innerHTML = messages.join("<br>");
+}
+
+function checkConflicts(){
+    generateJSON();
+    let cfg = JSON.parse(output.value);
+
+    let used = {};
+    let messages = [];
+
+    document.querySelectorAll(".signal").forEach(div=>{
+        div.classList.remove("conflict");
+    });
+
+    document.querySelectorAll(".signal").forEach(div=>{
+        let name     = div.querySelector(".name").value || "?";
+        let bitStart = div.querySelector(".bitStart").value;
+        let width    = div.querySelector(".width").value;
+        let bits     = [];
+
+        if(bitStart !== "" && width !== ""){
+            let bs = parseInt(bitStart);
+            let w  = parseInt(width);
+            for(let i = bs; i < bs + w; i++) bits.push(i);
+        }
+
+        bits.forEach(b=>{
+            if(used[b]){
+                messages.push(`&#10006; Bit <b>${b}</b> conflict: <b>${used[b].name}</b> vs <b>${name}</b>`);
+                div.classList.add("conflict");
+                used[b].div.classList.add("conflict");
+            } else {
+                used[b] = { name, div };
+            }
+        });
+    });
+
+    if(messages.length === 0){
+        showSummary(["&#10004; No conflicts found. All bits are correctly assigned."], false);
+    } else {
+        showSummary(messages, true);
+    }
+}
+
+// =========================
+// DIAGRAM
+// =========================
+function getColor(name){
+    let hash = 0;
+    for(let i=0;i<name.length;i++){
+        hash = name.charCodeAt(i) + ((hash<<5)-hash);
+    }
+    return `hsl(${hash % 360},70%,50%)`;
+}
+
+function drawDiagram(){
+    let area = document.getElementById("diagramArea");
+    area.innerHTML = "";
+
+    const MIN_SCALE = 18;   // minimum px per bit before scroll kicks in
+    const IDEAL_SCALE = 36; // preferred px per bit
+    const HEIGHT = 50;
+    const BORDER = 2;
+
+    let maxBit = 0;
+
+    document.querySelectorAll(".signal").forEach(div=>{
+        let bs = div.querySelector(".bitStart").value;
+        let w  = div.querySelector(".width").value;
+        if(bs !== "" && w !== ""){
+            maxBit = Math.max(maxBit, parseInt(bs) + parseInt(w) - 1);
+        }
+    });
+
+    let nStart = 4;
+    let nEnd = 4 + parseInt(addrBits.value) - 1;
+    maxBit = Math.max(maxBit, nEnd);
+
+    let totalBits = Math.max(maxBit + 1, 32);
+
+    // available width of the container (excluding border/padding)
+    let available = area.parentElement.clientWidth - 24;
+
+    // scale that fits everything; clamp to [MIN_SCALE, IDEAL_SCALE]
+    let fitScale = Math.floor((available - 40) / (totalBits + 1));
+    let SCALE = Math.min(IDEAL_SCALE, Math.max(MIN_SCALE, fitScale));
+    let OFFSET = SCALE;
+
+    // if even MIN_SCALE doesn't fit, use MIN_SCALE and let overflow-x scroll
+    let innerWidth = totalBits * SCALE + OFFSET + 40;
+
+    // size the inner scrollable div
+    let inner = document.createElement("div");
+    inner.style.cssText = `position:relative; width:${innerWidth}px; height:240px;`;
+    area.style.height = "250px";
+    area.appendChild(inner);
+
+    for(let i=0; i<totalBits; i++){
+        let tick = document.createElement("div");
+        tick.style.cssText = `position:absolute;left:${i*SCALE+OFFSET}px;top:40px;width:1px;height:10px;background:#888`;
+        let label = document.createElement("div");
+        label.style.cssText = `position:absolute;left:${i*SCALE+OFFSET+SCALE/2-6}px;top:20px;font-size:${Math.max(8, SCALE*0.4)}px`;
+        label.innerText = i;
+        inner.appendChild(tick);
+        inner.appendChild(label);
+    }
+
+    let lastTick = document.createElement("div");
+    lastTick.style.cssText = `position:absolute;left:${totalBits*SCALE+OFFSET}px;top:40px;width:1px;height:10px;background:#888`;
+    inner.appendChild(lastTick);
+
+    function createBlock(name, bStart, bEnd, y){
+        let widthBits = bEnd - bStart + 1;
+        let block = document.createElement("div");
+        block.className = "block";
+        block.style.left   = (bStart * SCALE + OFFSET) + "px";
+        block.style.top    = y + "px";
+        block.style.width  = (widthBits * SCALE - BORDER) + "px";
+        block.style.height = HEIGHT + "px";
+        block.style.background = getColor(name);
+        block.style.overflow = "hidden";
+
+        if(name === "ACTION")
+            block.style.background = "linear-gradient(45deg,#333,#777)";
+        if(name === "NEXT_ADDRESS")
+            block.style.background = "linear-gradient(45deg,#1a5276,#2e86c1)";
+
+        let fontSize = Math.max(8, Math.min(12, SCALE * 0.45));
+        let rangeText = bStart === bEnd ? `${bStart}` : `${bStart}..${bEnd}`;
+        block.innerHTML = `<div style="font-weight:bold;font-size:${fontSize}px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%">${name}</div><div style="font-size:${Math.max(7,fontSize-1)}px">${rangeText}</div>`;
+
+        inner.appendChild(block);
+    }
+
+    createBlock("ACTION", 0, 3, 90);
+
+    document.querySelectorAll(".signal").forEach(div=>{
+        let name     = div.querySelector(".name").value;
+        let bitStart = div.querySelector(".bitStart").value;
+        let width    = div.querySelector(".width").value;
+        if(!name || bitStart === "" || width === "") return;
+        let bStart = parseInt(bitStart);
+        let bEnd   = bStart + parseInt(width) - 1;
+        createBlock(name, bStart, bEnd, 90);
+    });
+
+    createBlock("NEXT_ADDRESS", nStart, nEnd, 170);
+}
+
+
+
+// =========================
+// DOCUMENTATION
+// =========================
+function generateDoc(){
+    generateJSON();
+    let cfg = JSON.parse(output.value);
+
+    let addrBitsVal = cfg.rom.address_bits;
+    let wordSizeVal = cfg.rom.word_size;
+    let romSize     = Math.pow(2, addrBitsVal);
+    let naStart     = 4;
+    let naEnd       = 4 + addrBitsVal - 1;
+
+    let doc = "";
+
+    doc += "========================================\n";
+    doc += "  MICROCODE ARCHITECTURE DOCUMENTATION\n";
+    doc += "========================================\n\n";
+
+    // ROM
+    doc += "[ ROM ]\n";
+    doc += `  Address bits : ${addrBitsVal}  (${romSize} addressable words)\n`;
+    doc += `  Word size    : ${wordSizeVal} bits\n`;
+    doc += `  Total ROM    : ${romSize * wordSizeVal} bits\n\n`;
+
+    // WORD LAYOUT
+    let sigList = Object.entries(cfg.signals).map(([name, sig])=>{
+        let bs, be;
+        if(sig.bit !== undefined){ bs = sig.bit; be = sig.bit; }
+        else { bs = sig.bits[0]; be = sig.bits[1]; }
+        return { name, bs, be };
+    }).sort((a,b)=>a.bs-b.bs);
+
+    doc += "[ CONTROL WORD LAYOUT ]\n";
+    doc += `  Bits  0 ..  3  ->  ACTION       (4 bits, ${Object.keys(cfg.action).length} operations)\n`;
+    sigList.forEach(s=>{
+        let w = s.be - s.bs + 1;
+        let range = s.bs === s.be
+            ? ` Bit ${s.bs.toString().padStart(2)}      `
+            : `Bits ${s.bs.toString().padStart(2)}..${s.be.toString().padStart(2)} `;
+        doc += `  ${range}  ->  ${s.name.padEnd(12)} (${w} bit${w>1?"s":""})\n`;
+    });
+    doc += `  Bits ${naStart.toString().padStart(2)}..${naEnd.toString().padStart(2)}  ->  NEXT_ADDRESS (${addrBitsVal} bits)\n\n`;
+
+    // ACTIONS
+    doc += "[ ACTIONS ]\n";
+    let actionEntries = Object.entries(cfg.action).sort((a,b)=>a[1]-b[1]);
+    let maxNameLen = Math.max(...actionEntries.map(([k])=>k.length), 4);
+    actionEntries.forEach(([name, val])=>{
+        let bin = val.toString(2).padStart(4,"0");
+        doc += `  ${name.padEnd(maxNameLen)}  =  ${val}  (0b${bin})\n`;
+    });
+    doc += "\n";
+
+    // SIGNALS
+    doc += "[ SIGNALS ]\n";
+    sigList.forEach(s=>{
+        let sig = cfg.signals[s.name];
+        let w = s.be - s.bs + 1;
+        let range = s.bs === s.be ? `bit ${s.bs}` : `bits ${s.bs}..${s.be}`;
+
+        doc += `\n  ${s.name}\n`;
+        doc += `    Position : ${range}\n`;
+        doc += `    Width    : ${w} bit${w>1?"s":""}\n`;
+
+        if(sig.values){
+            doc += `    Values   :\n`;
+            let maxVLen = Math.max(...Object.keys(sig.values).map(k=>k.length));
+            for(let v in sig.values){
+                let num = sig.values[v];
+                let bin = num.toString(2).padStart(w,"0");
+                doc += `      ${v.padEnd(maxVLen)}  =  ${num}  (0b${bin})\n`;
+            }
+        } else {
+            doc += `    Values   : raw ${w}-bit value\n`;
+        }
+    });
+    doc += "\n";
+
+    // SUMMARY
+    doc += "[ SUMMARY ]\n";
+    let usedBits = 4;
+    sigList.forEach(s=>{ usedBits += s.be - s.bs + 1; });
+    usedBits += addrBitsVal;
+    let unusedBits = wordSizeVal - usedBits;
+
+    doc += `  Control word : ${wordSizeVal} bits\n`;
+    doc += `  Used bits    : ${usedBits}\n`;
+    doc += `  Unused bits  : ${unusedBits >= 0 ? unusedBits : "OVERFLOW by " + Math.abs(unusedBits) + " bits"}\n`;
+    doc += `  Signals      : ${sigList.length}\n`;
+    doc += `  Actions      : ${actionEntries.length}\n`;
+
+    output.value = doc;
+}
+
+function exportPDF(){
+    generateDoc();
+    const { jsPDF } = window.jspdf;
+    let pdf = new jsPDF();
+    let lines = pdf.splitTextToSize(output.value, 180);
+    pdf.setFont("courier");
+    pdf.setFontSize(9);
+    pdf.text(lines, 10, 10);
+    pdf.save("microasm_architecture.pdf");
+}
+
+// =========================
+// INIT
+// =========================
+loadTheme();
+loadAutoSave();
+updateFileName();
+
+document.addEventListener("DOMContentLoaded", () => {
+    const filenameInput = document.getElementById("filename");
+    filenameInput.addEventListener("input", function(){
+        currentFileName = this.value.replace(" *","");
+        dirty = true;
+    });
+
+    // auto-redraw diagram on any change inside the signals section
+    const signalsContainer = document.getElementById("signals");
+
+    // childList: redraw when signals are added or removed
+    const observer = new MutationObserver(() => drawDiagram());
+    observer.observe(signalsContainer, { childList: true, subtree: false });
+
+    // "change" fires after the field loses focus — after validation/revert has already run
+    // "input" would fire on every keystroke, before validation, causing premature redraws
+    signalsContainer.addEventListener("change", () => {
+        if(!_suppressDiagram) drawDiagram();
+    });
+
+    // name field uses "input" since it has no validation to worry about
+    signalsContainer.addEventListener("input", e => {
+        if(e.target.classList.contains("name")) drawDiagram();
+    });
+
+    // also redraw when addrBits changes (affects NEXT_ADDRESS block)
+    document.getElementById("addrBits").addEventListener("change", () => drawDiagram());
+
+    drawDiagram();
+
+    // redraw diagram on window resize
+    window.addEventListener("resize", () => drawDiagram());
+
+    // also redraw if the signals section itself changes size (e.g. panel resized)
+    const resizeObserver = new ResizeObserver(() => drawDiagram());
+    resizeObserver.observe(document.querySelector(".section:has(#signals)"));
+});
+
+</script>
+
+</body>
+</html>
