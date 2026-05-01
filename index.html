@@ -1171,6 +1171,11 @@ function generateDoc(){
     let naStart     = 4;
     let naEnd       = 4 + addrBitsVal - 1;
 
+    // helper: right-align a number in a fixed-width field
+    const rn = (n, w) => String(n).padStart(w);
+    // helper: left-align a string in a fixed-width field
+    const ls = (s, w) => String(s).padEnd(w);
+
     let doc = "";
 
     doc += "========================================\n";
@@ -1178,10 +1183,12 @@ function generateDoc(){
     doc += "========================================\n\n";
 
     // ROM
+    let romTotalBits = romSize * wordSizeVal;
+    let romW = String(romTotalBits).length;   // widest number in this section
     doc += "[ ROM ]\n";
-    doc += `  Address bits : ${addrBitsVal}  (${romSize} addressable words)\n`;
-    doc += `  Word size    : ${wordSizeVal} bits\n`;
-    doc += `  Total ROM    : ${romSize * wordSizeVal} bits\n\n`;
+    doc += `  Address bits : ${rn(addrBitsVal, romW)}  (${rn(romSize, romW)} addressable words)\n`;
+    doc += `  Word size    : ${rn(wordSizeVal, romW)} bits\n`;
+    doc += `  Total ROM    : ${rn(romTotalBits, romW)} bits\n\n`;
 
     // WORD LAYOUT
     let sigList = Object.entries(cfg.signals).map(([name, sig])=>{
@@ -1191,24 +1198,37 @@ function generateDoc(){
         return { name, bs, be };
     }).sort((a,b)=>a.bs-b.bs);
 
+    let maxSigNameLen = Math.max(...sigList.map(s=>s.name.length), "ACTION".length, "NEXT_ADDRESS".length);
+    let bitW = String(naEnd).length;   // digits needed for largest bit number
+
+    // "Bits XX..YY" and "Bit  XX     " — arrow always at same column
+    const fmtRange = (bs, be) => {
+        if(bs === be)
+            // "Bit  XX      " — pad right so total width == "Bits XX..YY"
+            return `Bit  ${rn(bs, bitW)}` + " ".repeat(2 + bitW + 1); // ".." + end digit(s) + space
+        return `Bits ${rn(bs, bitW)}..${rn(be, bitW)} `;
+    };
+
+    // width column: right-align bit count, fixed 2 digits
+    const fmtBits = (w) => `${rn(w, 2)} bit${w > 1 ? "s" : " "}`;
+
     doc += "[ CONTROL WORD LAYOUT ]\n";
-    doc += `  Bits  0 ..  3  ->  ACTION       (4 bits, ${Object.keys(cfg.action).length} operations)\n`;
+    doc += `  ${fmtRange(0,3)} ->  ${ls("ACTION", maxSigNameLen)}  (${fmtBits(4)}, ${Object.keys(cfg.action).length} operations)\n`;
     sigList.forEach(s=>{
         let w = s.be - s.bs + 1;
-        let range = s.bs === s.be
-            ? ` Bit ${s.bs.toString().padStart(2)}      `
-            : `Bits ${s.bs.toString().padStart(2)}..${s.be.toString().padStart(2)} `;
-        doc += `  ${range}  ->  ${s.name.padEnd(12)} (${w} bit${w>1?"s":""})\n`;
+        doc += `  ${fmtRange(s.bs, s.be)} ->  ${ls(s.name, maxSigNameLen)}  (${fmtBits(w)})\n`;
     });
-    doc += `  Bits ${naStart.toString().padStart(2)}..${naEnd.toString().padStart(2)}  ->  NEXT_ADDRESS (${addrBitsVal} bits)\n\n`;
+    doc += `  ${fmtRange(naStart, naEnd)} ->  ${ls("NEXT_ADDRESS", maxSigNameLen)}  (${fmtBits(addrBitsVal)})\n\n`;
 
     // ACTIONS
     doc += "[ ACTIONS ]\n";
     let actionEntries = Object.entries(cfg.action).sort((a,b)=>a[1]-b[1]);
-    let maxNameLen = Math.max(...actionEntries.map(([k])=>k.length), 4);
+    let maxANameLen = Math.max(...actionEntries.map(([k])=>k.length), 4);
+    let maxAVal     = Math.max(...actionEntries.map(([,v])=>v));
+    let aValW       = String(maxAVal).length;
     actionEntries.forEach(([name, val])=>{
         let bin = val.toString(2).padStart(4,"0");
-        doc += `  ${name.padEnd(maxNameLen)}  =  ${val}  (0b${bin})\n`;
+        doc += `  ${ls(name, maxANameLen)}  =  ${rn(val, aValW)}  (0b${bin})\n`;
     });
     doc += "\n";
 
@@ -1217,7 +1237,7 @@ function generateDoc(){
     sigList.forEach(s=>{
         let sig = cfg.signals[s.name];
         let w = s.be - s.bs + 1;
-        let range = s.bs === s.be ? `bit ${s.bs}` : `bits ${s.bs}..${s.be}`;
+        let range = s.bs === s.be ? `bit ${rn(s.bs, bitW)}` : `bits ${rn(s.bs, bitW)}..${rn(s.be, bitW)}`;
 
         doc += `\n  ${s.name}\n`;
         doc += `    Position : ${range}\n`;
@@ -1225,12 +1245,14 @@ function generateDoc(){
 
         if(sig.values){
             doc += `    Values   :\n`;
-            let maxVLen = Math.max(...Object.keys(sig.values).map(k=>k.length));
-            for(let v in sig.values){
-                let num = sig.values[v];
+            let entries  = Object.entries(sig.values).sort((a,b)=>a[1]-b[1]);
+            let maxVName = Math.max(...entries.map(([k])=>k.length));
+            let maxVNum  = Math.max(...entries.map(([,v])=>v));
+            let vNumW    = String(maxVNum).length;
+            entries.forEach(([v, num])=>{
                 let bin = num.toString(2).padStart(w,"0");
-                doc += `      ${v.padEnd(maxVLen)}  =  ${num}  (0b${bin})\n`;
-            }
+                doc += `      ${ls(v, maxVName)}  =  ${rn(num, vNumW)}  (0b${bin})\n`;
+            });
         } else {
             doc += `    Values   : raw ${w}-bit value\n`;
         }
@@ -1239,16 +1261,15 @@ function generateDoc(){
 
     // SUMMARY
     doc += "[ SUMMARY ]\n";
-    let usedBits = 4;
-    sigList.forEach(s=>{ usedBits += s.be - s.bs + 1; });
-    usedBits += addrBitsVal;
+    let usedBits   = 4 + sigList.reduce((s,x)=>s + x.be - x.bs + 1, 0);
     let unusedBits = wordSizeVal - usedBits;
+    let sumW = String(Math.max(wordSizeVal, usedBits, Math.abs(unusedBits), sigList.length, actionEntries.length)).length;
 
-    doc += `  Control word : ${wordSizeVal} bits\n`;
-    doc += `  Used bits    : ${usedBits}\n`;
-    doc += `  Unused bits  : ${unusedBits >= 0 ? unusedBits : "OVERFLOW by " + Math.abs(unusedBits) + " bits"}\n`;
-    doc += `  Signals      : ${sigList.length}\n`;
-    doc += `  Actions      : ${actionEntries.length}\n`;
+    doc += `  Control word : ${rn(wordSizeVal, sumW)} bits\n`;
+    doc += `  Used bits    : ${rn(usedBits,    sumW)}\n`;
+    doc += `  Unused bits  : ${unusedBits >= 0 ? rn(unusedBits, sumW) : "OVERFLOW by " + Math.abs(unusedBits) + " bits"}\n`;
+    doc += `  Signals      : ${rn(sigList.length,        sumW)}\n`;
+    doc += `  Actions      : ${rn(actionEntries.length,  sumW)}\n`;
 
     output.value = doc;
 }
