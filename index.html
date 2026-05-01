@@ -10,7 +10,113 @@
 
 body {
     font-family: Arial;
-    margin: 20px; transition: 0.3s;
+    margin: 0;
+    padding: 72px 20px 64px 20px;
+    box-sizing: border-box;
+    transition: background 0.3s, color 0.3s;
+}
+
+/* ── FIXED HEADER ── */
+#app-header {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 1000;
+    background: #2c3e50;
+    color: #ecf0f1;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+#header-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 20px 4px;
+    font-size: 15px;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+#header-title span {
+    font-size: 11px;
+    font-weight: normal;
+    opacity: 0.6;
+}
+
+#header-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 20px;
+    flex-wrap: wrap;
+}
+
+#header-toolbar button {
+    background: rgba(255,255,255,0.12);
+    color: #ecf0f1;
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 4px;
+    padding: 3px 10px;
+    font-size: 12px;
+    cursor: pointer;
+    margin: 0;
+    transition: background 0.15s;
+}
+
+#header-toolbar button:hover {
+    background: rgba(255,255,255,0.25);
+}
+
+#header-toolbar #filename {
+    font-family: monospace;
+    font-size: 12px;
+    background: rgba(0,0,0,0.2);
+    color: #ecf0f1;
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 4px;
+    padding: 3px 8px;
+    width: 200px;
+    margin: 0;
+}
+
+/* ── FIXED FOOTER ── */
+#app-footer {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    z-index: 1000;
+    background: #2c3e50;
+    color: #bdc3c7;
+    font-size: 11px;
+    padding: 6px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 6px;
+    box-shadow: 0 -2px 8px rgba(0,0,0,0.3);
+}
+
+#app-footer a {
+    color: #3498db;
+    text-decoration: none;
+}
+
+#app-footer a:hover {
+    text-decoration: underline;
+}
+
+.dark #app-header,
+.dark #app-footer {
+    background: #1a1a2e;
+}
+
+.dark #header-toolbar button {
+    background: rgba(255,255,255,0.08);
+    border-color: rgba(255,255,255,0.15);
+}
+
+.dark #header-toolbar button:hover {
+    background: rgba(255,255,255,0.18);
 }
 
 .dark {
@@ -265,17 +371,20 @@ button {
 
 <body>
 
-<h2>MicroASM Config Editor</h2>
-
 <input type="file" id="fileInput" style="display:none">
 
-<div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
-    <button onclick="newFile()">New</button>
-    <button onclick="openFile()">Open JSON</button>
-    <button onclick="saveJSON()">Save JSON</button>
-    <button onclick="toggleTheme()">&#127769; Theme</button>
-    <input id="filename" type="text" value="New file"
-           style="margin-left:20px; font-size:12px; opacity:0.8; width:200px;">
+<div id="app-header">
+    <div id="header-title">
+        &#9654; MicroASM Config Editor
+        <span>Microcode ROM configuration tool</span>
+    </div>
+    <div id="header-toolbar">
+        <button onclick="newFile()">&#128196; New</button>
+        <button onclick="openFile()">&#128194; Open JSON</button>
+        <button onclick="saveJSON()">&#128190; Save JSON</button>
+        <button onclick="toggleTheme()">&#127769; Theme</button>
+        <input id="filename" type="text" value="New file">
+    </div>
 </div>
 
 <div class="section">
@@ -1331,6 +1440,20 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 </script>
+
+<div id="app-footer">
+    <div>
+        &copy; 2025 <strong>Jadir Eduardo Souza Lucas</strong>
+        &nbsp;&mdash;&nbsp;
+        Universidade Federal do Esp&iacute;rito Santo (UFES)
+        &nbsp;&mdash;&nbsp;
+        Departamento de Inform&aacute;tica
+    </div>
+    <div style="display:flex; gap:16px; align-items:center;">
+        <span>&#9993; <a href="mailto:jadir.lucas@ufes.br">jadir.lucas@ufes.br</a></span>
+        <span>&#9993; Telegram: <a href="https://t.me/profjadirlucas" target="_blank">@profjadirlucas</a></span>
+    </div>
+</div>
 
 </body>
 </html>
