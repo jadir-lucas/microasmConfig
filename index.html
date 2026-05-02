@@ -120,251 +120,279 @@ body {
 }
 
 .dark {
-    background:#1e1e1e;
-    color:#ddd;
+    background: #16213e;
+    color: #e0e0e0;
 }
 
-input, textarea {
-    margin: 4px;
+/* ── TABS ── */
+.tab-bar {
+    display: flex;
+    gap: 0;
+    margin-bottom: 18px;
+    border-bottom: 2px solid #dee2e6;
+}
+.dark .tab-bar { border-bottom-color: #2a3a5c; }
+
+.tab-btn {
+    padding: 9px 24px;
+    font-size: 13px;
+    font-weight: 600;
+    border: none;
+    border-bottom: 3px solid transparent;
+    background: none;
+    color: #888;
+    cursor: pointer;
+    margin: 0 0 -2px 0;
+    border-radius: 6px 6px 0 0;
+    letter-spacing: 0.3px;
+    transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+.tab-btn:hover { color: #2c3e50; background: #f0f4f8; }
+.tab-btn.active { color: #2980b9; border-bottom-color: #2980b9; background: none; }
+.dark .tab-btn { color: #6a7a9a; }
+.dark .tab-btn:hover { color: #ddd; background: rgba(255,255,255,0.05); }
+.dark .tab-btn.active { color: #5dade2; border-bottom-color: #5dade2; background: none; }
+
+.tab-pane { display: none; }
+.tab-pane.active { display: block; }
+
+/* ── CARDS ── */
+.card {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 14px rgba(44,62,80,0.09);
+    padding: 16px 18px;
+    margin-bottom: 0;
+}
+.dark .card {
+    background: #1e2a45;
+    box-shadow: 0 2px 14px rgba(0,0,0,0.4);
 }
 
-.section {
-    border:1px solid #888;
-    padding:10px;
-    margin-bottom:15px;
+.card h3 {
+    margin: 0 0 10px 0;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #2980b9;
+    border-bottom: 1px solid #eaf0f6;
+    padding-bottom: 6px;
+    font-weight: 700;
 }
+.dark .card h3 { color: #5dade2; border-bottom-color: #2a3a5c; }
 
-.signal, .action-row {
+/* ── GRID LAYOUT ── */
+.config-grid {
     display: grid;
-    align-items: center;
-    gap: 4px;
-    padding: 3px 5px;
+    grid-template-columns: 1fr 1.6fr;
+    gap: 16px;
+    align-items: start;
+}
+.config-left { display: flex; flex-direction: column; gap: 16px; }
+@media (max-width: 860px) { .config-grid { grid-template-columns: 1fr; } }
+
+/* ── INPUTS ── */
+input, textarea {
+    margin: 2px;
+    border: 1px solid #d0d7de;
+    border-radius: 5px;
+    padding: 3px 7px;
+    font-size: 13px;
+    background: #fff;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+input:focus, textarea:focus {
+    outline: none;
+    border-color: #2980b9;
+    box-shadow: 0 0 0 3px rgba(41,128,185,0.12);
+}
+.dark input:not([type="hidden"]), .dark textarea, .dark select {
+    background: #16213e;
+    color: #e0e0e0;
+    border-color: #2a3a5c;
+}
+.dark input:focus, .dark textarea:focus {
+    border-color: #5dade2;
+    box-shadow: 0 0 0 3px rgba(93,173,226,0.15);
 }
 
-.action-row {
-    grid-template-columns: 110px 80px 28px;
+/* ── BUTTONS ── */
+button {
+    margin: 3px;
+    padding: 5px 13px;
+    border: 1px solid #d0d7de;
+    border-radius: 6px;
+    background: #f6f8fa;
+    color: #24292f;
+    font-size: 12px;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s, box-shadow 0.1s;
+}
+button:hover {
+    background: #e9ecef;
+    border-color: #adb5bd;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+}
+.dark button { background: #253555; color: #e0e0e0; border-color: #3a4a6a; }
+.dark button:hover { background: #2e4070; border-color: #5dade2; }
+
+/* only the ✕ delete buttons get 24x24 — exclude values-toggle and panel buttons */
+.signal button:not(.values-toggle):not(.values-panel-btn),
+.action-row button {
+    width: 24px; height: 24px;
+    padding: 0; margin: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; line-height: 1; cursor: pointer;
 }
 
+/* values-toggle: full-width label button */
+.values-toggle {
+    font-size: 12px; padding: 4px 8px; cursor: pointer;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    text-align: left; width: 100%; min-height: 28px;
+    border: 1px solid #d0d7de; border-radius: 5px;
+    background: #f6f8fa; color: #24292f;
+    margin: 0;
+}
+.dark .values-toggle { background: #253555; color: #e0e0e0; border-color: #3a4a6a; }
+.values-toggle:hover { background: #e9ecef; }
+.dark .values-toggle:hover { background: #2e4070; }
+
+/* + Add value button inside panel */
+.values-panel-btn {
+    font-size: 12px; padding: 4px 12px;
+    margin-top: 6px; width: auto; height: auto;
+}
+
+/* ── ROWS ── */
+.signal, .action-row {
+    display: grid; align-items: center; gap: 4px; padding: 3px 2px;
+}
+.action-row { grid-template-columns: 110px 80px 28px; }
 .signal {
     grid-template-columns: 110px 60px 50px 160px 28px;
-}
-
-.signal .values-btn {
-    width: 100%;
-    height: 24px;
+    row-gap: 0;
+    align-items: center;
 }
 
 .col-header {
+    display: grid; align-items: center; gap: 4px; padding: 3px 2px;
+    font-size: 11px; font-weight: 700; color: #8a9ab0;
+    border-bottom: 1px solid #eaf0f6; margin-bottom: 4px;
+    white-space: nowrap; text-transform: uppercase; letter-spacing: 0.5px;
+}
+.action-header { grid-template-columns: 110px 80px 28px; }
+.signal-header  { grid-template-columns: 110px 60px 50px 160px 28px; }
+.dark .col-header { color: #5a6a8a; border-bottom-color: #2a3a5c; }
+.dark label { color: #8a9ab0; }
+
+.rom-subheader {
+    font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.5px; color: #8a9ab0;
+    border-bottom: 1px solid #eaf0f6;
+    padding-bottom: 4px; margin: 10px 0 8px 0;
+}
+.dark .rom-subheader { border-bottom-color: #2a3a5c; }
+
+.rom-grid {
     display: grid;
+    grid-template-columns: 100px auto;
+    gap: 6px 16px;
     align-items: center;
-    gap: 4px;
-    padding: 3px 5px;
-    font-size: 13px;
-    font-weight: bold;
-    color: #555;
-    border-bottom: 1px solid #ccc;
-    margin-bottom: 2px;
-    white-space: nowrap;
+    padding-left: 8px;
 }
+.rom-grid label { font-size: 12px; color: #555; }
+.dark .rom-grid label { color: #8a9ab0; }
 
-.action-header {
-    grid-template-columns: 110px 80px 28px;
-}
+#signals, #actions { border-bottom: 1px dashed #d0d7de; margin-bottom: 8px; }
+.dark #signals, .dark #actions { border-bottom-color: #2a3a5c; }
 
-.signal-header {
-    grid-template-columns: 110px 60px 50px 160px 28px;
-}
+.conflict { background: #ffdede; border-radius: 4px; }
+.dark .conflict { background: #5c1a1a; }
 
-.dark .col-header {
-    color: #aaa;
-    border-bottom-color: #555;
-}
-
-#signals, #actions {
-    border-bottom: 1px dashed #aaa;
-    margin-bottom: 6px;
-}
-
-.conflict {
-    background:#ff6b6b;
-}
-
+/* ── DIAGRAM ── */
 .block {
-    position:absolute;
-    border-radius:8px;
-    color:white;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    cursor:default;
-    font-size:12px;
-    text-align:center;
-    padding:4px;
-    box-sizing:border-box;
+    position: absolute; border-radius: 8px; color: white;
+    display: flex; flex-direction: column; align-items: center;
+    justify-content: center; cursor: default; font-size: 12px;
+    text-align: center; padding: 4px; box-sizing: border-box;
+}
+#diagramArea {
+    position: relative; width: 100%; min-height: 260px;
+    border: 1px solid #d0d7de; border-radius: 6px;
+    overflow-x: auto; background: #f8f9fa; margin-top: 10px;
+}
+.dark #diagramArea { border-color: #2a3a5c; background: #16213e; }
+
+/* ── OUTPUT ── */
+#output {
+    display: block; width: 100%; box-sizing: border-box;
+    font-family: 'Courier New', monospace; font-size: 12px;
+    resize: vertical; border: 1px solid #d0d7de; border-radius: 6px;
+    padding: 10px; line-height: 1.6;
+}
+.dark #output { background: #16213e; color: #e0e0e0; border-color: #2a3a5c; }
+
+/* ── ALERTS ── */
+#conflictSummary { display: none; margin-top:8px; padding:8px 12px; border-radius:6px; font-size:13px; }
+#conflictSummary.ok { background:#d4edda; color:#155724; border:1px solid #c3e6cb; display:block; }
+#conflictSummary.err { background:#f8d7da; color:#721c24; border:1px solid #f5c6cb; display:block; }
+.dark #conflictSummary.ok { background:#1a3a25; color:#7ec89a; border-color:#2d6a4f; }
+.dark #conflictSummary.err { background:#3a1a1e; color:#e07c84; border-color:#6a2d32; }
+
+#signalError, #actionError {
+    display: none; margin-top:6px; padding:7px 12px;
+    border-radius:6px; font-size:13px;
+    background:#f8d7da; color:#721c24; border:1px solid #f5c6cb;
 }
 
-#filename {
-    font-family: monospace;
-    background: rgba(0,0,0,0.05);
-    padding: 3px 6px;
-    border-radius: 4px;
+/* value-row used in inline values panel */
+.value-row {
+    display: grid; grid-template-columns: 120px 70px 28px;
+    align-items: center; gap: 4px; padding: 2px 0;
 }
 
-.dark #filename {
-    background: rgba(255,255,255,0.1);
-    color: #ddd;
-}
-
-.dark #output {
-    background: #2a2a2a;
-    color: #ddd;
-    border-color: #555;
-}
-
-.dark button {
-    background: #3a3a3a;
-    color: #ddd;
-    border: 1px solid #666;
-}
-
-.dark button:hover {
-    background: #4a4a4a;
-    border-color: #888;
-}
-
-.dark input:not([type="hidden"]),
-.dark textarea,
-.dark select {
-    background: #2a2a2a;
-    color: #ddd;
-    border: 1px solid #555;
-}
-
-.dark .section {
-    border-color: #555;
-}
-
-.dark .col-header {
-    color: #aaa;
-    border-bottom-color: #555;
-}
-
-canvas {
-    border:1px solid black;
-    margin-top:10px;
+.values-panel {
     display: none;
+    grid-column: 1 / -1;        /* span all grid columns */
+    background: #f0f4f8;
+    border: 1px solid #d0d7de;
+    border-radius: 6px;
+    padding: 8px 10px;
+    margin-top: 2px;
+    margin-bottom: 4px;
 }
 
-button {
-    margin:5px;
+.dark .values-panel {
+    background: #1a2a40;
+    border-color: #2a3a5c;
 }
 
-.signal button, .action-row button {
-    width: 24px;
-    height: 24px;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
-    line-height: 1;
-    cursor: pointer;
+.values-panel.open { display: block; }
+
+
+
+.values-panel-header {
+    display: grid;
+    grid-template-columns: 120px 70px 28px;
+    gap: 4px;
+    font-size: 11px; font-weight: 700; color: #8a9ab0;
+    text-transform: uppercase; letter-spacing: 0.5px;
+    border-bottom: 1px solid #d0d7de;
+    margin-bottom: 4px; padding-bottom: 3px;
 }
 
-#conflictSummary {
-    display:none;
-    margin-top:8px;
-    padding:8px 12px;
-    border-radius:6px;
-    font-size:13px;
-}
-
-#conflictSummary.ok {
-    background:#d4edda;
-    color:#155724;
-    border:1px solid #c3e6cb;
-}
-
-#conflictSummary.err {
-    background:#f8d7da;
-    color:#721c24;
-    border:1px solid #f5c6cb;
-}
-
-.dark #conflictSummary.ok {
-    background:#1a3a25;
-    color:#7ec89a;
-    border-color:#2d6a4f;
-}
-
-.dark #conflictSummary.err {
-    background:#3a1a1e;
-    color:#e07c84;
-    border-color:#6a2d32;
-}
-
-/* Values dialog */
-#valuesDialog {
-    border: 1px solid #888;
-    border-radius: 8px;
-    padding: 16px;
-    min-width: 320px;
-    box-shadow: 0 4px 24px rgba(0,0,0,0.25);
-}
-
-#valuesDialog::backdrop {
-    background: rgba(0,0,0,0.4);
-}
-
-.dark #valuesDialog {
-    background: #2a2a2a;
-    color: #ddd;
-    border-color: #555;
-}
+.dark .values-panel-header { border-bottom-color: #2a3a5c; }
 
 .value-row {
     display: grid;
-    grid-template-columns: 120px 80px 28px;
-    align-items: center;
-    gap: 4px;
-    padding: 2px 4px;
+    grid-template-columns: 120px 70px 28px;
+    align-items: center; gap: 4px; padding: 2px 0;
 }
 
-.value-header {
-    display: grid;
-    grid-template-columns: 120px 80px 28px;
-    gap: 4px;
-    padding: 2px 4px;
-    font-size: 13px;
-    font-weight: bold;
-    color: #555;
-    border-bottom: 1px solid #ccc;
-    margin-bottom: 2px;
-    white-space: nowrap;
-}
 
-.dark .value-header {
-    color: #aaa;
-    border-bottom-color: #555;
-}
 
-#valuesList {
-    margin-bottom: 8px;
-    min-height: 32px;
-}
-
-.values-btn {
-    font-size: 11px;
-    padding: 2px 6px;
-    cursor: pointer;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 160px;
-    text-align: left;
-}
+canvas { display: none; }
 
 </style>
 </head>
@@ -380,50 +408,119 @@ button {
     </div>
     <div id="header-toolbar">
         <button onclick="newFile()">&#128196; New</button>
-        <button onclick="openFile()">&#128194; Open JSON</button>
-        <button onclick="saveJSON()">&#128190; Save JSON</button>
+        <button onclick="openFile()">&#128194; Load</button>
+        <button onclick="saveJSON()">&#128190; Save</button>
         <button onclick="toggleTheme()">&#127769; Theme</button>
         <input id="filename" type="text" value="New file">
     </div>
 </div>
 
-<div class="section">
-    <h3>ROM</h3>
-    Address bits: <input id="addrBits" type="number" value="12" style="width:60px">
-    &nbsp;&nbsp;
-    Word size: <input id="wordSize" type="number" value="32" style="width:60px">
+<!-- TAB BAR -->
+<div class="tab-bar">
+    <button class="tab-btn active" onclick="switchTab('config',this)">&#9881; Configuration</button>
+    <button class="tab-btn" onclick="switchTab('diagram',this)">&#9638; Diagram</button>
+    <button class="tab-btn" onclick="switchTab('docs',this)">&#128196; Documentation</button>
 </div>
 
-<div class="section">
-    <h3>Actions</h3>
-    <div class="col-header action-header">
-        <span>Name</span><span>Value (0-15)</span><span></span>
+<!-- TAB: CONFIGURATION -->
+<div id="tab-config" class="tab-pane active">
+    <div class="config-grid">
+        <!-- LEFT COLUMN -->
+        <div class="config-left">
+            <div class="card">
+                <h3>ROM</h3>
+                <div class="rom-grid">
+                    <label>Address bits</label>
+                    <input id="addrBits" type="number" value="12" style="width:60px">
+                    <label>Word size</label>
+                    <input id="wordSize" type="number" value="32" style="width:60px">
+                </div>
+
+                <div class="rom-subheader">Action field</div>
+                <div class="rom-grid">
+                    <label>Width</label>
+                    <input id="actionWidth" type="number" value="4" min="1" style="width:60px">
+                </div>
+
+                <div class="rom-subheader">Next address field</div>
+                <div class="rom-grid">
+                    <label>Overlapped</label>
+                    <label style="cursor:pointer;">
+                        <input id="naOverlapped" type="checkbox" checked style="width:auto; margin-right:4px;">
+                        yes
+                    </label>
+                </div>
+                <!-- hidden spans keep computed values accessible to JS -->
+                <span id="actionBitStart" style="display:none">0</span>
+                <span id="naBitStart"     style="display:none">4</span>
+                <span id="naWidth"        style="display:none">12</span>
+            </div>
+            <div class="card">
+                <h3>Actions</h3>
+                <div class="col-header action-header">
+                    <span>Name</span><span id="actionValueHeader">Value (0-15)</span><span></span>
+                </div>
+                <div id="actions"></div>
+                <div style="margin-top:8px; display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+                    <select id="actionNameSelect" style="font-size:12px; padding:3px 6px; border-radius:5px; border:1px solid #d0d7de;">
+                        <option value="">— select action —</option>
+                        <option>BEGIN</option>
+                        <option>DISPATCH</option>
+                        <option>GOTO</option>
+                        <option>NEXT</option>
+                        <option>ifCgoto</option>
+                        <option>ifNgoto</option>
+                        <option>ifZgoto</option>
+                        <option>ifVgoto</option>
+                        <option>ifNCgoto</option>
+                        <option>ifNNgoto</option>
+                        <option>ifNZgoto</option>
+                        <option>ifNVgoto</option>
+                        <option>ifCexec</option>
+                        <option>ifNexec</option>
+                        <option>ifZexec</option>
+                        <option>ifVexec</option>
+                    </select>
+                    <button onclick="addSelectedAction()">&#43; Add</button>
+                    <button onclick="checkActions()">&#10003; Check</button>
+                </div>
+                <div id="actionError"></div>
+            </div>
+        </div>
+        <!-- RIGHT COLUMN -->
+        <div class="card">
+            <h3>Signals</h3>
+            <div class="col-header signal-header">
+                <span>Name</span><span>Start bit</span><span>Width</span><span>Values</span><span></span>
+            </div>
+            <div id="signals"></div>
+            <div style="margin-top:6px;">
+                <button onclick="addSignal()">&#43; Add signal</button>
+                <button onclick="checkConflicts()">&#10003; Check conflicts</button>
+            </div>
+            <div id="signalError"></div>
+            <div id="conflictSummary"></div>
+        </div>
     </div>
-    <div id="actions"></div>
-    <button onclick="addAction()">Add action</button>
-    <button onclick="checkActions()">Check actions</button>
-    <div id="actionError" style="display:none; margin-top:6px; padding:6px 10px; border-radius:4px; font-size:13px; background:#f8d7da; color:#721c24; border:1px solid #f5c6cb;"></div>
 </div>
 
-<div class="section">
-    <h3>Signals</h3>
-    <div class="col-header signal-header">
-        <span>Name</span><span>Start bit</span><span>Width</span><span>Values</span><span></span>
+<!-- TAB: DIAGRAM -->
+<div id="tab-diagram" class="tab-pane">
+    <div class="card">
+        <h3>Control Word Diagram</h3>
+        <div id="diagramArea"></div>
     </div>
-    <div id="signals"></div>
-    <button onclick="addSignal()">Add signal</button>
-    <button onclick="checkConflicts()">Check conflicts</button>
-    <div id="signalError" style="display:none; margin-top:6px; padding:6px 10px; border-radius:4px; font-size:13px; background:#f8d7da; color:#721c24; border:1px solid #f5c6cb;"></div>
-    <div id="conflictSummary"></div>
-    <div id="diagramArea" style="position:relative; width:100%; min-height:120px; border:1px solid #aaa; margin-top:10px; overflow-x:auto;"></div>
 </div>
 
-<div class="section">
-    <h3>Output</h3>
-    <textarea id="output" rows="15" style="display:block; width:100%; box-sizing:border-box; font-family:monospace; font-size:12px; resize:vertical;"></textarea>
-    <div style="margin-top:6px;">
-        <button onclick="generateDoc()">Generate documentation</button>
-        <button onclick="exportPDF()">Export PDF</button>
+<!-- TAB: DOCUMENTATION -->
+<div id="tab-docs" class="tab-pane">
+    <div class="card">
+        <h3>Documentation</h3>
+        <textarea id="output" rows="28"></textarea>
+        <div style="margin-top:8px;">
+            <button onclick="generateDoc()">&#9998; Generate</button>
+            <button onclick="exportPDF()">&#128196; Export PDF</button>
+        </div>
     </div>
 </div>
 
@@ -431,19 +528,7 @@ button {
 
 <datalist id="signalNames"></datalist>
 
-<dialog id="valuesDialog">
-    <b id="valuesDialogTitle" style="display:block;margin-bottom:10px;font-size:14px;"></b>
-    <div class="value-header">
-        <span>Name</span><span>Value</span><span></span>
-    </div>
-    <div id="valuesList"></div>
-    <button onclick="addValueRow()">Add value</button>
-    <div id="valuesError" style="display:none; margin-top:8px; padding:6px 10px; border-radius:4px; font-size:13px; background:#f8d7da; color:#721c24; border:1px solid #f5c6cb;"></div>
-    <div style="margin-top:10px; display:flex; gap:8px; justify-content:flex-end;">
-        <button onclick="closeValuesDialog(true)">OK</button>
-        <button onclick="closeValuesDialog(false)">Cancel</button>
-    </div>
-</dialog>
+
 
 <script>
 
@@ -463,11 +548,15 @@ window.onbeforeunload = () => dirty ? "There are unsaved changes!" : null;
 
 function autoSave(){
     const state = {
-        addrBits: addrBits.value,
-        wordSize: wordSize.value,
-        actions: document.getElementById("actions").innerHTML,
-        signals: document.getElementById("signals").innerHTML,
-        filename: currentFileName
+        addrBits:       addrBits.value,
+        wordSize:       wordSize.value,
+        actionWidth:    document.getElementById("actionWidth").value,
+        naBitStart:     document.getElementById("naBitStart").textContent,
+        naWidth:        document.getElementById("naWidth").textContent,
+        naOverlapped:   document.getElementById("naOverlapped").checked,
+        actions:        document.getElementById("actions").innerHTML,
+        signals:        document.getElementById("signals").innerHTML,
+        filename:       currentFileName
     };
     localStorage.setItem("microasm_autosave", JSON.stringify(state));
 }
@@ -479,7 +568,11 @@ function loadAutoSave(){
 
     const s = JSON.parse(data);
     addrBits.value = s.addrBits;
-    if(s.wordSize) wordSize.value = s.wordSize;
+    if(s.wordSize)       wordSize.value = s.wordSize;
+    if(s.actionWidth !== undefined) document.getElementById("actionWidth").value = s.actionWidth;
+    if(s.naBitStart !== undefined) document.getElementById("naBitStart").textContent = s.naBitStart;
+    if(s.naWidth !== undefined) document.getElementById("naWidth").textContent = s.naWidth;
+    if(s.naOverlapped   !== undefined) document.getElementById("naOverlapped").checked = s.naOverlapped;
     document.getElementById("actions").innerHTML = s.actions || "";
     document.getElementById("signals").innerHTML = s.signals || "";
     currentFileName = s.filename || "Recovered";
@@ -562,6 +655,10 @@ function newFile(){
 
     addrBits.value = 12;
     wordSize.value = 32;
+    document.getElementById("actionWidth").value = 4;
+    document.getElementById("naBitStart").textContent = 4;
+    document.getElementById("naWidth").textContent    = addrBits.value || 12;
+    document.getElementById("naOverlapped").checked   = true;
     document.getElementById("actions").innerHTML = "";
     document.getElementById("signals").innerHTML = "";
     output.value = "";
@@ -587,6 +684,12 @@ function validateConfig(cfg){
 
     if(!cfg.action)
         errors.push("Missing actions");
+
+    if(cfg.action && !cfg.action.bits)
+        errors.push("action.bits missing");
+
+    if(cfg.action && !cfg.action.values)
+        errors.push("action.values missing");
 
     let used = {};
 
@@ -624,9 +727,25 @@ function loadJSONContent(text){
     addrBits.value = cfg.rom.address_bits;
     if(cfg.rom.word_size) wordSize.value = cfg.rom.word_size;
 
+    // action field position
+    if(cfg.action && cfg.action.bits){
+        let abs = cfg.action.bits[0];
+        let awe = cfg.action.bits[1] - cfg.action.bits[0] + 1;
+        
+        document.getElementById("actionWidth").value    = awe;
+    }
+
+    // next_address field
+    if(cfg.next_address && cfg.next_address.bits){
+        document.getElementById("naBitStart").textContent = cfg.next_address.bits[0];
+        document.getElementById("naWidth").textContent = cfg.next_address.bits[1] - cfg.next_address.bits[0] + 1;
+        document.getElementById("naOverlapped").checked = cfg.next_address.overlaped !== false;
+    }
+
     document.getElementById("actions").innerHTML = "";
-    for(let k in cfg.action){
-        addAction(k, cfg.action[k]);
+    let actionValues = cfg.action && cfg.action.values ? cfg.action.values : {};
+    for(let k in actionValues){
+        addAction(k, actionValues[k]);
     }
 
     document.getElementById("signals").innerHTML = "";
@@ -671,6 +790,9 @@ function loadJSONContent(text){
         }
 
         addSignal(s, bitStart, width, values);
+        // sync panel display after adding
+        let lastSig = document.querySelector("#signals .signal:last-child");
+        if(lastSig) syncValuesFromPanel(lastSig);
     }
 
     hideSummary();
@@ -680,15 +802,52 @@ function loadJSONContent(text){
 // =========================
 // ACTIONS
 // =========================
+const ALLOWED_ACTIONS = [
+    "BEGIN","DISPATCH","GOTO","NEXT",
+    "ifCgoto","ifNgoto","ifZgoto","ifVgoto",
+    "ifNCgoto","ifNNgoto","ifNZgoto","ifNVgoto",
+    "ifCexec","ifNexec","ifZexec","ifVexec"
+];
+
+function addSelectedAction(){
+    let sel = document.getElementById("actionNameSelect");
+    let name = sel.value;
+    if(!name){ showActionError("Please select an action name."); return; }
+
+    // check if already added
+    let existing = Array.from(document.querySelectorAll(".actionName")).map(i=>i.textContent);
+    if(existing.includes(name)){
+        showActionError("Action \"" + name + "\" is already in the list.");
+        return;
+    }
+
+    // suggest next available value
+    let usedVals = Array.from(document.querySelectorAll(".actionValue"))
+        .map(i=>parseInt(i.value)).filter(v=>!isNaN(v));
+    let next = 0;
+    while(usedVals.includes(next)) next++;
+
+    addAction(name, next);
+    sel.value = "";
+}
+
 function addAction(name="", value=""){
     const div = document.createElement("div");
     div.className = "action-row";
     div.innerHTML = `
-    <input class="actionName" value="${name}">
+    <span class="actionName" style="font-size:13px; font-family:monospace; padding:2px 4px;">${name}</span>
     <input class="actionValue" type="number" min="0" max="15" value="${value}">
     <button onclick="this.closest('.action-row').remove()">&#10005;</button>
     `;
     document.getElementById("actions").appendChild(div);
+}
+
+function showActionError(msg){
+    let box = document.getElementById("actionError");
+    box.innerHTML = "&#9888; " + msg;
+    box.style.display = "block";
+    clearTimeout(showActionError._t);
+    showActionError._t = setTimeout(()=>{ box.style.display="none"; }, 5000);
 }
 
 // =========================
@@ -707,9 +866,10 @@ function updateAutocomplete(){
 }
 
 function nextAvailableBit(){
+    let aWidth = parseInt(document.getElementById("actionWidth").value) || 4;
     let rows = document.querySelectorAll(".signal");
-    if(rows.length === 0) return 4;
-    let max = 4;
+    if(rows.length === 0) return aWidth;  // start right after ACTION field
+    let max = aWidth;
     rows.forEach(div=>{
         let bs = parseInt(div.querySelector(".bitStart").value);
         let w  = parseInt(div.querySelector(".width").value);
@@ -730,20 +890,36 @@ function sortSignals(){
 }
 
 function repackSignals(changedDiv){
-    // after a width change, recalculate bitStart of all subsequent signals
+    // after a width change on one signal, recalculate bitStart of subsequent signals
     sortSignals();
     let rows = Array.from(document.querySelectorAll(".signal"));
     let idx  = rows.indexOf(changedDiv);
     if(idx < 0) return;
 
-    // recalculate from the changed row onward
     for(let i = idx; i < rows.length - 1; i++){
         let bs = parseInt(rows[i].querySelector(".bitStart").value);
         let w  = parseInt(rows[i].querySelector(".width").value);
         if(isNaN(bs) || isNaN(w)) continue;
-        let nextBs = rows[i+1].querySelector(".bitStart");
-        nextBs.value = bs + w;
+        rows[i+1].querySelector(".bitStart").value = bs + w;
     }
+
+    updateNaBitStart();
+}
+
+function repackAllSignals(){
+    // after actionWidth changes, shift ALL signals starting from actionWidth
+    let aWidth = parseInt(document.getElementById("actionWidth").value) || 4;
+    sortSignals();
+    let rows = Array.from(document.querySelectorAll(".signal"));
+    let cursor = aWidth;   // first available bit after ACTION
+
+    rows.forEach(row => {
+        let w = parseInt(row.querySelector(".width").value) || 1;
+        row.querySelector(".bitStart").value = cursor;
+        cursor += w;
+    });
+
+    updateNaBitStart();
 }
 
 function showSignalError(msg){
@@ -763,7 +939,7 @@ function checkActions(){
     let errors = [];
 
     rows.forEach(row => {
-        let name = row.querySelector(".actionName").value.trim();
+        let name = row.querySelector(".actionName").textContent.trim();
         let val  = parseInt(row.querySelector(".actionValue").value);
 
         if(!name) return;
@@ -783,30 +959,69 @@ function checkActions(){
     });
 
     let box = document.getElementById("actionError");
+    clearTimeout(checkActions._timer);
     if(errors.length){
         box.innerHTML = errors.map(e => "&#9888; " + e).join("<br>");
+        box.style.color = ""; box.style.background = ""; box.style.borderColor = "";
         box.style.display = "block";
+        checkActions._timer = setTimeout(() => { box.style.display = "none"; }, 8000);
     } else {
         box.innerHTML = "&#10004; No issues found in Actions.";
         box.style.color = "#155724";
         box.style.background = "#d4edda";
         box.style.borderColor = "#c3e6cb";
         box.style.display = "block";
-        clearTimeout(checkActions._timer);
         checkActions._timer = setTimeout(() => {
             box.style.display = "none";
-            box.style.color = "";
-            box.style.background = "#f8d7da";
-            box.style.borderColor = "#f5c6cb";
+            box.style.color = ""; box.style.background = ""; box.style.borderColor = "";
         }, 4000);
     }
 }
 
+function updateActionHeader(){
+    let aWidth = parseInt(document.getElementById("actionWidth").value) || 4;
+    let maxVal = Math.pow(2, aWidth) - 1;
+    document.getElementById("actionValueHeader").textContent = "Value (0-" + maxVal + ")";
+    // also update max attribute on all actionValue inputs
+    document.querySelectorAll(".actionValue").forEach(inp => inp.max = maxVal);
+}
+
+function updateNaWidth(){
+    // naWidth always equals addrBits
+    let ab = parseInt(document.getElementById("addrBits").value) || 12;
+    document.getElementById("naWidth").textContent = ab;
+}
+
+function updateNaBitStart(){
+    let aWidth  = parseInt(document.getElementById("actionWidth").value) || 4;
+    let naOver  = document.getElementById("naOverlapped").checked;
+    let naStart;
+
+    if(naOver){
+        // overlapped: starts right after ACTION field (bit 0 + aWidth)
+        naStart = aWidth;
+    } else {
+        // not overlapped: starts after the last signal bit
+        let lastBit = aWidth - 1; // at minimum, after ACTION
+        document.querySelectorAll(".signal").forEach(div => {
+            let bs = parseInt(div.querySelector(".bitStart").value);
+            let w  = parseInt(div.querySelector(".width").value);
+            if(!isNaN(bs) && !isNaN(w)) lastBit = Math.max(lastBit, bs + w - 1);
+        });
+        naStart = lastBit + 1;
+    }
+
+    document.getElementById("naBitStart").textContent = naStart;
+}
+
 function availableSignalBits(){
-    // word_size - 4 (ACTION bits 0-3)
-    // NEXT_ADDRESS bits overlap signals intentionally and are not subtracted
-    let ws = parseInt(document.getElementById("wordSize").value) || 32;
-    return ws - 4;
+    let ws      = parseInt(document.getElementById("wordSize").value)      || 32;
+    let aWidth  = parseInt(document.getElementById("actionWidth").value)   || 4;
+    let naWidth = parseInt(document.getElementById("naWidth").textContent) || 12;
+    let naOver  = document.getElementById("naOverlapped").checked;
+    // if overlapped: NEXT_ADDRESS shares bits with signals — don't subtract
+    // if not overlapped: NEXT_ADDRESS occupies exclusive bits
+    return ws - aWidth - (naOver ? 0 : naWidth);
 }
 
 function usedSignalBits(excludeDiv){
@@ -837,15 +1052,34 @@ function addSignal(name="", bitStart="", width="", values=""){
     }
     const div = document.createElement("div");
     div.className = "signal";
-    // store values as data attribute, display as button label
+
+    // build values rows HTML from existing values string
+    function buildValueRows(valStr){
+        if(!valStr) return "";
+        return valStr.split(",").filter(p=>p.includes("=")).map(p=>{
+            let [k,v] = p.split("=");
+            return `<div class="value-row">
+                <input class="vName" value="${k.trim()}" placeholder="Name">
+                <input class="vValue" type="number" min="0" value="${v.trim()}">
+                <button onclick="removeValueRow(this)" style="width:24px;height:24px;padding:0;margin:0;display:flex;align-items:center;justify-content:center;font-size:14px;">&#10005;</button>
+            </div>`;
+        }).join("");
+    }
+
     let valLabel = valuesLabel(values);
     div.innerHTML = `
     <input class="name" list="signalNames" value="${name}">
     <input class="bitStart" type="number" min="0" value="${bitStart}">
     <input class="width" type="number" min="1" value="${width}">
     <input class="values" type="hidden" value="${values}">
-    <button class="values-btn" onclick="openValuesDialog(this.closest('.signal'))">${valLabel}</button>
-    <button onclick="this.closest('.signal').remove()">&#10005;</button>
+    <button class="values-toggle" onclick="toggleValuesPanel(this.closest('.signal'))">${valLabel}</button>
+    <button onclick="removeSignal(this.closest('.signal'))">&#10005;</button>
+    <div class="values-panel">
+        <div class="values-panel-header"><span>Name</span><span>Value</span><span></span></div>
+        <div class="values-rows">${buildValueRows(values)}</div>
+        <button class="values-panel-btn" onclick="addInlineValueRow(this.closest('.signal'))">&#43; Add value</button>
+        <div class="values-panel-error" style="display:none;margin-top:4px;padding:4px 8px;border-radius:4px;font-size:12px;background:#f8d7da;color:#721c24;border:1px solid #f5c6cb;"></div>
+    </div>
     `;
     document.getElementById("signals").appendChild(div);
     div.querySelector(".bitStart").addEventListener("change", sortSignals);
@@ -917,8 +1151,6 @@ function addSignal(name="", bitStart="", width="", values=""){
 // VALUES DIALOG
 // =========================
 
-let _valuesTargetSignal = null;
-
 function valuesLabel(str){
     if(!str) return "— no values —";
     let parts = str.split(",").filter(p=>p.includes("="));
@@ -926,124 +1158,78 @@ function valuesLabel(str){
     return parts.map(p=>p.trim()).join("  |  ");
 }
 
-function nextSuggestedValue(){
-    // returns last numeric value in the list + 1, or 0 if empty
-    let rows = document.querySelectorAll("#valuesList .value-row");
-    if(rows.length === 0) return 0;
-    let last = rows[rows.length - 1].querySelector(".vValue");
-    let v = parseInt(last.value);
-    return isNaN(v) ? 0 : v + 1;
+function toggleValuesPanel(signalDiv){
+    let panel = signalDiv.querySelector(".values-panel");
+    panel.classList.toggle("open");
 }
 
-function addValueRow(name="", value=""){
-    if(value === "") value = nextSuggestedValue();
-    let list = document.getElementById("valuesList");
+function addInlineValueRow(signalDiv){
+    let rows = signalDiv.querySelectorAll(".value-row .vValue");
+    let nextVal = 0;
+    if(rows.length > 0){
+        let last = parseInt(rows[rows.length-1].value);
+        if(!isNaN(last)) nextVal = last + 1;
+    }
+    let container = signalDiv.querySelector(".values-rows");
     let row = document.createElement("div");
     row.className = "value-row";
     row.innerHTML = `
-    <input class="vName" value="${name}" placeholder="Label">
-    <input class="vValue" type="number" min="0" value="${value}">
-    <button onclick="this.closest('.value-row').remove()" style="width:24px;height:24px;padding:0;margin:0;display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer;">&#10005;</button>
+    <input class="vName" value="" placeholder="Name">
+    <input class="vValue" type="number" min="0" value="${nextVal}">
+    <button onclick="removeValueRow(this)" style="width:24px;height:24px;padding:0;margin:0;display:flex;align-items:center;justify-content:center;font-size:14px;">&#10005;</button>
     `;
-    list.appendChild(row);
+    container.appendChild(row);
+    row.querySelector(".vName").focus();
+    syncValuesFromPanel(signalDiv);
 }
 
-function openValuesDialog(signalDiv){
-    _valuesTargetSignal = signalDiv;
-    let sigName = signalDiv.querySelector(".name").value || "Signal";
-    document.getElementById("valuesDialogTitle").textContent = `Values for: ${sigName}`;
-
-    // populate from hidden input
-    let current = signalDiv.querySelector(".values").value;
-    let list = document.getElementById("valuesList");
-    list.innerHTML = "";
-
-    if(current){
-        current.split(",").forEach(p=>{
-            let [k,v] = p.split("=");
-            if(k !== undefined && v !== undefined)
-                addValueRow(k.trim(), v.trim());
-        });
-    }
-
-    // sync dark theme
-    if(document.body.classList.contains("dark"))
-        document.getElementById("valuesDialog").style.cssText = "background:#2a2a2a;color:#ddd;border-color:#555;border-radius:8px;padding:16px;min-width:320px;";
-    else
-        document.getElementById("valuesDialog").style.cssText = "";
-
-    document.getElementById("valuesError").style.display = "none";
-    document.getElementById("valuesDialog").showModal();
+function removeValueRow(btn){
+    let signalDiv = btn.closest(".signal");
+    btn.closest(".value-row").remove();
+    syncValuesFromPanel(signalDiv);
 }
 
-function closeValuesDialog(save){
-    if(save && _valuesTargetSignal){
-        let rows = document.querySelectorAll("#valuesList .value-row");
-        let parts = [];
-        rows.forEach(row=>{
-            let k = row.querySelector(".vName").value.trim();
-            let v = row.querySelector(".vValue").value.trim();
-            if(k) parts.push(`${k}=${v}`);
-        });
+function removeSignal(signalDiv){
+    signalDiv.remove();
+    sortSignals();
+}
 
-        const showValuesError = (msg) => {
-            let box = document.getElementById("valuesError");
-            box.innerHTML = "&#9888; " + msg.replace(/\n/g, "<br>");
-            box.style.display = "block";
-        };
-        document.getElementById("valuesError").style.display = "none";
+function syncValuesFromPanel(signalDiv){
+    let width    = parseInt(signalDiv.querySelector(".width").value) || 1;
+    let capacity = Math.pow(2, width);
+    let errBox   = signalDiv.querySelector(".values-panel-error");
+    let rows     = signalDiv.querySelectorAll(".value-row");
 
-        // check for duplicate names
-        let names = parts.map(p => p.split("=")[0].trim());
-        let dupNames = [...new Set(names.filter((n, i) => names.indexOf(n) !== i))];
-        if(dupNames.length){
-            showValuesError("Duplicate label name(s): " + dupNames.join(", ") +
-                            "\nEach label must be unique.");
-            return;
+    let parts = [], names = [], nums = [], errors = [];
+
+    rows.forEach(row => {
+        let k = row.querySelector(".vName").value.trim();
+        let v = parseInt(row.querySelector(".vValue").value);
+        if(!k) return;
+        if(names.includes(k)) errors.push("Duplicate label: " + k);
+        else names.push(k);
+        if(!isNaN(v)){
+            if(nums.includes(v)) errors.push("Duplicate value: " + v);
+            else nums.push(v);
+            if(v >= capacity) errors.push("Value " + v + " exceeds " + width + "-bit range (0.." + (capacity-1) + ")");
+            parts.push(k + "=" + v);
         }
+    });
 
-        // check for duplicate numeric values
-        let nums = parts.map(p => parseInt(p.split("=")[1]));
-        let dupNums = [...new Set(nums.filter((n, i) => nums.indexOf(n) !== i))];
-        if(dupNums.length){
-            showValuesError("Duplicate numeric value(s): " + dupNums.join(", ") +
-                            "\nEach numeric value must be unique.");
-            return;
-        }
-
-        // sort by numeric value ascending
-        parts.sort((a, b) => {
-            let va = parseInt(a.split("=")[1]);
-            let vb = parseInt(b.split("=")[1]);
-            return va - vb;
-        });
-
-        // validate count and max value against current Width
-        let width    = parseInt(_valuesTargetSignal.querySelector(".width").value) || 1;
-        let capacity = Math.pow(2, width);
-        let count    = parts.length;
-        let maxVal   = parts.reduce((mx, p) => {
-            let v = parseInt(p.split("=")[1]);
-            return isNaN(v) ? mx : Math.max(mx, v);
-        }, 0);
-
-        if(count > capacity || (count > 0 && maxVal >= capacity)){
-            let sigName = _valuesTargetSignal.querySelector(".name").value || "this signal";
-            showValuesError("Values exceed Width capacity for \"" + sigName + "\":\n" +
-                  count + " value(s), max=" + maxVal +
-                  " — Width=" + width + " supports 0.." + (capacity-1) + " only.\n" +
-                  "Increase Width or reduce/fix the values.");
-            return;
-        }
-
-        let str = parts.join(",");
-        _valuesTargetSignal.querySelector(".values").value = str;
-        _valuesTargetSignal.querySelector(".values-btn").textContent = valuesLabel(str);
-        dirty = true;
-        autoSave();
+    if(errors.length){
+        errBox.innerHTML = "&#9888; " + errors.join(" &nbsp;|&nbsp; ");
+        errBox.style.display = "block";
+    } else {
+        errBox.style.display = "none";
     }
-    document.getElementById("valuesDialog").close();
-    _valuesTargetSignal = null;
+
+    parts.sort((a,b) => parseInt(a.split("=")[1]) - parseInt(b.split("=")[1]));
+
+    let str = parts.join(",");
+    signalDiv.querySelector(".values").value = str;
+    signalDiv.querySelector(".values-toggle").textContent = valuesLabel(str);
+    dirty = true;
+    autoSave();
 }
 
 // =========================
@@ -1060,19 +1246,32 @@ function parseValues(str){
 }
 
 function generateJSON(){
+    let aStart = 0;
+    let aWidth = parseInt(document.getElementById("actionWidth").value)    || 4;
+    let naStart2 = parseInt(document.getElementById("naBitStart").textContent) || 4;
+    let naWidth2 = parseInt(document.getElementById("naWidth").textContent) || 12;
+    let naOver   = document.getElementById("naOverlapped").checked;
+
     let cfg = {
         rom:{
             address_bits: parseInt(addrBits.value),
-            word_size: parseInt(wordSize.value)
+            word_size:    parseInt(wordSize.value)
         },
-        action:{},
-        signals:{}
+        action:{
+            bits:   [aStart, aStart + aWidth - 1],
+            values: {}
+        },
+        signals:{},
+        next_address:{
+            bits:      [naStart2, naStart2 + naWidth2 - 1],
+            overlaped: naOver
+        }
     };
 
     document.querySelectorAll(".action-row").forEach(div=>{
-        let name  = div.querySelector(".actionName").value.trim();
+        let name  = div.querySelector(".actionName").textContent.trim();
         let value = div.querySelector(".actionValue").value;
-        if(name) cfg.action[name] = parseInt(value);
+        if(name) cfg.action.values[name] = parseInt(value);
     });
 
     document.querySelectorAll(".signal").forEach(div=>{
@@ -1117,14 +1316,39 @@ function showSummary(messages, isError){
     box.style.display = "block";
     box.className = isError ? "err" : "ok";
     box.innerHTML = messages.join("<br>");
+    clearTimeout(showSummary._timer);
+    showSummary._timer = setTimeout(() => {
+        box.style.display = "none";
+        box.className = "";
+    }, isError ? 8000 : 4000);
 }
 
 function checkConflicts(){
     generateJSON();
     let cfg = JSON.parse(output.value);
 
+    let naOver   = document.getElementById("naOverlapped").checked;
+    let naStart  = parseInt(document.getElementById("naBitStart").textContent) || 4;
+    let naWidth  = parseInt(document.getElementById("naWidth").textContent) || 12;
+    let aStart   = 0;
+    let aWidth   = parseInt(document.getElementById("actionWidth").value)    || 4;
+
     let used = {};
     let messages = [];
+
+    // pre-populate ACTION bits as reserved
+    for(let i = aStart; i < aStart + aWidth; i++) used[i] = { name: "ACTION", div: null };
+
+    // if not overlapped, pre-populate NEXT_ADDRESS bits too
+    if(!naOver){
+        for(let i = naStart; i < naStart + naWidth; i++){
+            if(used[i]){
+                messages.push(`&#10006; Bit <b>${i}</b> conflict: <b>${used[i].name}</b> vs <b>NEXT_ADDRESS</b>`);
+            } else {
+                used[i] = { name: "NEXT_ADDRESS", div: null };
+            }
+        }
+    }
 
     document.querySelectorAll(".signal").forEach(div=>{
         div.classList.remove("conflict");
@@ -1146,7 +1370,7 @@ function checkConflicts(){
             if(used[b]){
                 messages.push(`&#10006; Bit <b>${b}</b> conflict: <b>${used[b].name}</b> vs <b>${name}</b>`);
                 div.classList.add("conflict");
-                used[b].div.classList.add("conflict");
+                if(used[b].div) used[b].div.classList.add("conflict");
             } else {
                 used[b] = { name, div };
             }
@@ -1175,12 +1399,20 @@ function drawDiagram(){
     let area = document.getElementById("diagramArea");
     area.innerHTML = "";
 
-    const MIN_SCALE = 18;   // minimum px per bit before scroll kicks in
-    const IDEAL_SCALE = 36; // preferred px per bit
+    const MIN_SCALE = 18;
+    const IDEAL_SCALE = 36;
     const HEIGHT = 50;
     const BORDER = 2;
 
-    let maxBit = 0;
+    let naOver   = document.getElementById("naOverlapped").checked;
+    let naStart  = parseInt(document.getElementById("naBitStart").textContent) || 4;
+    let naWidth3 = parseInt(document.getElementById("naWidth").textContent) || 12;
+    let nEnd     = naStart + naWidth3 - 1;
+    let aStart   = parseInt(document.getElementById("actionBitStart").value)   || 0;
+    let aWidth3  = parseInt(document.getElementById("actionWidth").value)      || 4;
+    let aEnd     = aStart + aWidth3 - 1;
+
+    let maxBit = aEnd;
 
     document.querySelectorAll(".signal").forEach(div=>{
         let bs = div.querySelector(".bitStart").value;
@@ -1190,8 +1422,6 @@ function drawDiagram(){
         }
     });
 
-    let nStart = 4;
-    let nEnd = 4 + parseInt(addrBits.value) - 1;
     maxBit = Math.max(maxBit, nEnd);
 
     let totalBits = Math.max(maxBit + 1, 32);
@@ -1250,8 +1480,10 @@ function drawDiagram(){
         inner.appendChild(block);
     }
 
-    createBlock("ACTION", 0, 3, 90);
+    // ACTION always on top row
+    createBlock("ACTION", aStart, aEnd, 90);
 
+    // signals on top row
     document.querySelectorAll(".signal").forEach(div=>{
         let name     = div.querySelector(".name").value;
         let bitStart = div.querySelector(".bitStart").value;
@@ -1262,7 +1494,12 @@ function drawDiagram(){
         createBlock(name, bStart, bEnd, 90);
     });
 
-    createBlock("NEXT_ADDRESS", nStart, nEnd, 170);
+    // NEXT_ADDRESS: overlapped = bottom row; not overlapped = same row as signals
+    if(naOver){
+        createBlock("NEXT_ADDRESS", naStart, nEnd, 170);
+    } else {
+        createBlock("NEXT_ADDRESS", naStart, nEnd, 90);
+    }
 }
 
 
@@ -1277,8 +1514,14 @@ function generateDoc(){
     let addrBitsVal = cfg.rom.address_bits;
     let wordSizeVal = cfg.rom.word_size;
     let romSize     = Math.pow(2, addrBitsVal);
-    let naStart     = 4;
-    let naEnd       = 4 + addrBitsVal - 1;
+
+    // read actual field positions from config
+    let actBits  = cfg.action && cfg.action.bits ? cfg.action.bits : [0, 3];
+    let naStart  = cfg.next_address && cfg.next_address.bits ? cfg.next_address.bits[0] : 4;
+    let naEnd    = cfg.next_address && cfg.next_address.bits ? cfg.next_address.bits[1] : 4 + addrBitsVal - 1;
+    let naOver   = cfg.next_address ? cfg.next_address.overlaped !== false : true;
+    let actWidth = actBits[1] - actBits[0] + 1;
+    let naWidth4 = naEnd - naStart + 1;
 
     // helper: right-align a number in a fixed-width field
     const rn = (n, w) => String(n).padStart(w);
@@ -1321,13 +1564,14 @@ function generateDoc(){
     // width column: right-align bit count, fixed 2 digits
     const fmtBits = (w) => `${rn(w, 2)} bit${w > 1 ? "s" : " "}`;
 
+    let actionValues = cfg.action && cfg.action.values ? cfg.action.values : {};
     doc += "[ CONTROL WORD LAYOUT ]\n";
-    doc += `  ${fmtRange(0,3)} ->  ${ls("ACTION", maxSigNameLen)}  (${fmtBits(4)}, ${Object.keys(cfg.action).length} operations)\n`;
+    doc += `  ${fmtRange(actBits[0], actBits[1])} ->  ${ls("ACTION", maxSigNameLen)}  (${fmtBits(actWidth)}, ${Object.keys(actionValues).length} operations)\n`;
     sigList.forEach(s=>{
         let w = s.be - s.bs + 1;
         doc += `  ${fmtRange(s.bs, s.be)} ->  ${ls(s.name, maxSigNameLen)}  (${fmtBits(w)})\n`;
     });
-    doc += `  ${fmtRange(naStart, naEnd)} ->  ${ls("NEXT_ADDRESS", maxSigNameLen)}  (${fmtBits(addrBitsVal)})\n\n`;
+    doc += `  ${fmtRange(naStart, naEnd)} ->  ${ls("NEXT_ADDRESS", maxSigNameLen)}  (${fmtBits(naWidth4)}${naOver ? ", overlapped" : ""})\n\n`;
 
     // ACTIONS
     doc += "[ ACTIONS ]\n";
@@ -1370,7 +1614,8 @@ function generateDoc(){
 
     // SUMMARY
     doc += "[ SUMMARY ]\n";
-    let usedBits   = 4 + sigList.reduce((s,x)=>s + x.be - x.bs + 1, 0);
+    let sigBits    = sigList.reduce((s,x)=>s + x.be - x.bs + 1, 0);
+    let usedBits   = actWidth + sigBits + (naOver ? 0 : naWidth4);
     let unusedBits = wordSizeVal - usedBits;
     let sumW = String(Math.max(wordSizeVal, usedBits, Math.abs(unusedBits), sigList.length, actionEntries.length)).length;
 
@@ -1387,16 +1632,46 @@ function exportPDF(){
     generateDoc();
     const { jsPDF } = window.jspdf;
     let pdf = new jsPDF();
-    let lines = pdf.splitTextToSize(output.value, 180);
     pdf.setFont("courier");
     pdf.setFontSize(9);
-    pdf.text(lines, 10, 10);
+
+    const pageH    = pdf.internal.pageSize.getHeight();
+    const marginT  = 10;
+    const marginB  = 10;
+    const lineH    = 4.5;
+    const maxLines = Math.floor((pageH - marginT - marginB) / lineH);
+
+    let lines = pdf.splitTextToSize(output.value, 185);
+    let y = marginT;
+
+    lines.forEach((line, i) => {
+        if(i > 0 && i % maxLines === 0){
+            pdf.addPage();
+            y = marginT;
+        }
+        pdf.text(line, 10, y);
+        y += lineH;
+    });
+
     pdf.save("microasm_architecture.pdf");
 }
 
 // =========================
 // INIT
 // =========================
+// =========================
+// TABS
+// =========================
+function switchTab(name, btn){
+    document.querySelectorAll(".tab-pane").forEach(p => p.classList.remove("active"));
+    document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+    document.getElementById("tab-" + name).classList.add("active");
+    btn.classList.add("active");
+
+    // redraw diagram when switching to diagram tab
+    if(name === "diagram") setTimeout(() => drawDiagram(), 50);
+}
+
 loadTheme();
 loadAutoSave();
 updateFileName();
@@ -1421,29 +1696,143 @@ document.addEventListener("DOMContentLoaded", () => {
         if(!_suppressDiagram) drawDiagram();
     });
 
+    // sync values panel on input (real-time feedback)
+    signalsContainer.addEventListener("input", e => {
+        let panel = e.target.closest(".values-panel");
+        if(panel) syncValuesFromPanel(panel.closest(".signal"));
+    });
+
     // name field uses "input" since it has no validation to worry about
     signalsContainer.addEventListener("input", e => {
         if(e.target.classList.contains("name")) drawDiagram();
     });
 
     // also redraw when addrBits changes (affects NEXT_ADDRESS block)
-    document.getElementById("addrBits").addEventListener("change", () => drawDiagram());
+    document.getElementById("addrBits").addEventListener("change", () => {
+        updateNaWidth();
+        updateNaBitStart();
+        drawDiagram();
+    });
 
+    // recalculate naBitStart when actionWidth, naOverlapped or any signal changes
+    const actionWidthInput = document.getElementById("actionWidth");
+    actionWidthInput.dataset.last = actionWidthInput.value;
+    let _actionWidthReverting = false;
+
+    actionWidthInput.addEventListener("change", () => {
+        if(_actionWidthReverting) return;
+
+        let newWidth = parseInt(actionWidthInput.value) || 4;
+        let oldWidth = parseInt(actionWidthInput.dataset.last) || 4;
+
+        // block increase if total bits would exceed word size
+        if(newWidth > oldWidth){
+            let ws      = parseInt(document.getElementById("wordSize").value) || 32;
+            let naOver  = document.getElementById("naOverlapped").checked;
+            let naWidth = parseInt(document.getElementById("naWidth").textContent) || 12;
+            let sigBits = Array.from(document.querySelectorAll(".signal"))
+                .reduce((s, div) => s + (parseInt(div.querySelector(".width").value) || 0), 0);
+            let total = newWidth + sigBits + (naOver ? 0 : naWidth);
+
+            if(total > ws){
+                let box = document.getElementById("actionError");
+                box.innerHTML = "&#9888; Cannot increase Action Width to " + newWidth +
+                    ": ACTION (" + newWidth + ") + Signals (" + sigBits + ")" +
+                    (naOver ? "" : " + NEXT_ADDRESS (" + naWidth + ")") +
+                    " = " + total + " bits exceeds Word size (" + ws + ").";
+                box.style.color = ""; box.style.background = ""; box.style.borderColor = "";
+                box.style.display = "block";
+                clearTimeout(checkActions._timer);
+                checkActions._timer = setTimeout(() => { box.style.display = "none"; }, 8000);
+
+                // revert
+                _actionWidthReverting = true;
+                _suppressDiagram = true;
+                actionWidthInput.value = oldWidth;
+                actionWidthInput.dataset.last = oldWidth;
+                _suppressDiagram = false;
+                _actionWidthReverting = false;
+                return;
+            }
+        }
+
+        actionWidthInput.dataset.last = newWidth;
+        updateActionHeader();
+        repackAllSignals();
+        drawDiagram();
+
+        // warn if reduction causes action values to exceed new capacity
+        if(newWidth < oldWidth){
+            let maxVal = Math.pow(2, newWidth) - 1;
+            let errors = [];
+            document.querySelectorAll(".action-row").forEach(row => {
+                let name = row.querySelector(".actionName").textContent.trim();
+                let val  = parseInt(row.querySelector(".actionValue").value);
+                if(!isNaN(val) && val > maxVal)
+                    errors.push("Action \"" + name + "\" = " + val + " exceeds max " + maxVal);
+            });
+            if(errors.length){
+                let box = document.getElementById("actionError");
+                box.innerHTML = "&#9888; Width reduced — out-of-range values:<br>" + errors.join("<br>");
+                box.style.color = ""; box.style.background = ""; box.style.borderColor = "";
+                box.style.display = "block";
+                clearTimeout(checkActions._timer);
+                checkActions._timer = setTimeout(() => { box.style.display = "none"; }, 8000);
+            }
+        }
+    });
+    document.getElementById("naOverlapped").addEventListener("change", function(){
+        if(!this.checked){
+            // verify total bits fit when removing overlap
+            let ws      = parseInt(document.getElementById("wordSize").value) || 32;
+            let aWidth  = parseInt(document.getElementById("actionWidth").value) || 4;
+            let naWidth = parseInt(document.getElementById("naWidth").textContent) || 12;
+            let sigBits = 0;
+            document.querySelectorAll(".signal").forEach(div=>{
+                let w = parseInt(div.querySelector(".width").value);
+                if(!isNaN(w)) sigBits += w;
+            });
+            let total = aWidth + sigBits + naWidth;
+            if(total > ws){
+                let box = document.getElementById("signalError");
+                box.innerHTML = "&#9888; Cannot remove overlap: ACTION (" + aWidth + ") + Signals (" +
+                    sigBits + ") + NEXT_ADDRESS (" + naWidth + ") = " + total +
+                    " bits exceeds Word size (" + ws + ").";
+                box.style.display = "block";
+                clearTimeout(showSignalError._timer);
+                showSignalError._timer = setTimeout(()=>{ box.style.display="none"; }, 7000);
+                _suppressDiagram = true;
+                this.checked = true;   // revert
+                _suppressDiagram = false;
+                return;
+            }
+        }
+        updateNaBitStart();
+        drawDiagram();
+    });
+    // also recalc when signals change (affects not-overlapped case)
+    signalsContainer.addEventListener("change", () => updateNaBitStart());
+    signalsContainer.addEventListener("DOMSubtreeModified", () => updateNaBitStart());
+
+    updateActionHeader();
+    updateNaWidth();
+    updateNaBitStart();
     drawDiagram();
 
     // redraw diagram on window resize
     window.addEventListener("resize", () => drawDiagram());
 
-    // also redraw if the signals section itself changes size (e.g. panel resized)
+    // redraw when diagram card resizes
     const resizeObserver = new ResizeObserver(() => drawDiagram());
-    resizeObserver.observe(document.querySelector(".section:has(#signals)"));
+    const diagramCard = document.getElementById("tab-diagram");
+    if(diagramCard) resizeObserver.observe(diagramCard);
 });
 
 </script>
 
 <div id="app-footer">
     <div>
-        &copy; 2026 <strong>Jadir Eduardo Souza Lucas</strong>
+        &copy; 2025 <strong>Jadir Eduardo Souza Lucas</strong>
         &nbsp;&mdash;&nbsp;
         Universidade Federal do Esp&iacute;rito Santo (UFES)
         &nbsp;&mdash;&nbsp;
